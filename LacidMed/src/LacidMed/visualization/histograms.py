@@ -44,7 +44,7 @@ class HistogramGenerator:
 
         return hist, bins
 
-    def create_histogram_3D(self, offset: int = 0, show: bool = True):
+    def create_histogram_of_3d_array(self, offset: int = 0, show: bool = True):
         """
         Generates a 3D histogram from the provided 3D array and returns the bins and frequencies.
 
@@ -79,7 +79,7 @@ class HistogramGenerator:
                 plt.plot(bins, average_hist)
                 plt.xlabel("Pixel Value")
                 plt.ylabel("Frequency")
-                plt.title("3D Histogram")
+                plt.title("Average Histogram from 3D Array")
                 plt.grid()
                 plt.show()
             except Exception as e:
