@@ -37,13 +37,19 @@ class MultipleFileWriter:
                 if new_pixel_array.shape == (ds.Rows, ds.Columns):
                     ds.PixelData = new_pixel_array.tobytes()
                     ds.Rows, ds.Columns = new_pixel_array.shape
-                    unique_output_path = output_path + "_" + os.path.basename(dicom_file)
-                    if os.path.exists(unique_output_path) and os.access(unique_output_path, os.W_OK):
+                    unique_output_path = (
+                        output_path + "_" + os.path.basename(dicom_file)
+                    )
+                    if os.path.exists(unique_output_path) and os.access(
+                        unique_output_path, os.W_OK
+                    ):
                         ds.save_as(unique_output_path)
                     else:
                         raise ValueError("Invalid or unwritable output path")
                 else:
-                    raise ValueError("Shape of new_pixel_array does not match original pixel data")
+                    raise ValueError(
+                        "Shape of new_pixel_array does not match original pixel data"
+                    )
             except Exception as e:
                 print(f"Error writing file {dicom_file}: {str(e)}")
 
@@ -53,13 +59,19 @@ class MultipleFileWriter:
                 if new_pixel_array.shape == (ds.Rows, ds.Columns):
                     ds.PixelData = new_pixel_array.tobytes()
                     ds.Rows, ds.Columns = new_pixel_array.shape
-                    unique_output_path = output_path + "_" + os.path.basename(dicom_file)
-                    if os.path.exists(unique_output_path) and os.access(unique_output_path, os.W_OK):
+                    unique_output_path = (
+                        output_path + "_" + os.path.basename(dicom_file)
+                    )
+                    if os.path.exists(unique_output_path) and os.access(
+                        unique_output_path, os.W_OK
+                    ):
                         ds.save_as(unique_output_path)
                     else:
                         raise ValueError("Invalid or unwritable output path")
                 else:
-                    raise ValueError("Shape of new_pixel_array does not match original pixel data")
+                    raise ValueError(
+                        "Shape of new_pixel_array does not match original pixel data"
+                    )
             except Exception as e:
                 print(f"Error writing file {dicom_file}: {str(e)}")
 
