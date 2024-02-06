@@ -72,12 +72,12 @@ class DicomLoaderMRI:
         """
         if self._sorted_files is None:
             files = self._get_files()
-            sorted_files = files.sort(
+            files.sort(
                 key=lambda file: pydicom.dcmread(
                     file, stop_before_pixels=True
                 ).InstanceNumber
             )
-            self._sorted_files = sorted_files
+            self._sorted_files = files
         return self._sorted_files
 
     def _get_files(self) -> List[str]:
