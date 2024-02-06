@@ -17,6 +17,8 @@ class DicomReorganizer:
         self.study_directory = study_directory
 
     def _clean_text(
+
+
         self,
         string,
         forbidden_symbols=["*", ".", ",", '"', "\\", "/", "|", "[", "]", ":", ";", " "],
