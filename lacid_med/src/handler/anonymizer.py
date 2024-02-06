@@ -45,7 +45,6 @@ class Anonymizer:
                 ds = pydicom.dcmread(dicom_file)
                 ds.PatientID = study_id
                 ds.remove_private_tags()
-                ds.remove_private_sequence()
                 output_file = os.path.join(
                     self.output_dir, f"anonymized_{os.path.basename(dicom_file)}"
                 )
