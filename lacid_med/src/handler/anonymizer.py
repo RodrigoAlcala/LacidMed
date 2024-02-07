@@ -1,3 +1,4 @@
+from pathlib import Path
 import uuid
 import os
 import pydicom
@@ -35,19 +36,40 @@ class Anonymizer:
             raise e
 
     def _perform_anonymization(self) -> None:
-        """
-        Reads each DICOM file, replaces the patient ID with a randomly generated UUID, removes private tags and sequences,
-        and saves the anonymized DICOM files in the output directory.
-        """
-        study_id = str(uuid.uuid4())
+        sequence_dirs = {}  # Dictionary to store mapping between imaging sequence and directory path
+
+        # Check if the output directory exists and create it if it doesn't
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
         for dicom_file in self.dicom_files:
-            if os.path.exists(dicom_file):
-                ds = pydicom.dcmread(dicom_file)
-                ds.PatientID = study_id
-                ds.remove_private_tags()
-                output_file = os.path.join(
-                    self.output_dir, f"anonymized_{os.path.basename(dicom_file)}"
-                )
-                ds.save_as(output_file)
-            else:
-                raise FileNotFoundError(f"File not found: {dicom_file}")
+            file_path = Path(dicom_file)
+            if not file_path.exists():
+                raise FileNotFoundError(f"File not found: {file_path}")
+
+            try:
+                ds = pydicom.dcmread(file_path)
+            except Exception as e:
+                print(f"Error reading DICOM file: {file_path}")
+                continue
+
+            # Use a more reliable method to get the imaging sequence
+            sequence = ds.get("SequenceName", "UnknownSequence")
+
+            if sequence not in sequence_dirs:
+                # Create a new directory for the imaging sequence
+                sequence_dir = self.output_dir / sequence
+                os.makedirs(sequence_dir, exist_ok=True)
+                sequence_dirs[sequence] = sequence_dir
+
+            study_id = str(uuid.uuid4())
+            ds.PatientID = study_id
+
+            # Remove private tags and other sensitive information
+            ds.remove_private_tags()
+            ds.PatientName = ""
+            ds.PatientBirthDate = ""
+            ds.PatientSex = ""
+
+            output_file = sequence_dirs[sequence] / f"anonymized_{file_path.name}"
+            ds.save_as(output_file)
