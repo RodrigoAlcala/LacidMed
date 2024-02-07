@@ -1,4 +1,4 @@
-# Author: Rodrigo N. Alcalá M. ralcala@skiff.com
+# Author: Rodrigo N. Alcalá M. rodrigo.alcala@skiff.com
 
 """
 In this file you will find a general example of the handling workflow.
