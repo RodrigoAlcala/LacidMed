@@ -58,7 +58,8 @@ class Anonymizer:
 
             if sequence not in sequence_dirs:
                 # Create a new directory for the imaging sequence
-                sequence_dir = self.output_dir / sequence
+                #sequence_dir = self.output_dir / sequence
+                sequence_dir = os.path.join(self.output_dir, sequence)
                 os.makedirs(sequence_dir, exist_ok=True)
                 sequence_dirs[sequence] = sequence_dir
 
@@ -71,5 +72,5 @@ class Anonymizer:
             ds.PatientBirthDate = ""
             ds.PatientSex = ""
 
-            output_file = sequence_dirs[sequence] / f"anonymized_{file_path.name}"
+            output_file = os.path.join(sequence_dirs[sequence], f"anonymized_{file_path.name}")
             ds.save_as(output_file)
