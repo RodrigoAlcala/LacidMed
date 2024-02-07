@@ -20,17 +20,17 @@ from lacid_med.src.handler.writer import MultipleFileWriter
 
 def main():
     
-    org_path = "/home/ralcala/Documents/FUESMEN/LacidMed/data/anon" # path to the original DICOM files
+    org_path = "/home/ralcala/Documents/FUESMEN/LacidMed/data" # path to the original DICOM files
     
     reorganizer = DicomReorganizer(study_directory=org_path)
-    #reorganizer.reorganize()
+    reorganizer.reorganize()
     
     decompressed_files = "/home/ralcala/Documents/FUESMEN/LacidMed/data/20135603"
     
     loader = DicomLoaderMRI(directory_path=decompressed_files)
     sorted_files = loader.sorted_files
     
-    anomyzer = Anonymizer(dicom_files=sorted_files, output_dir="/home/ralcala/Documents/FUESMEN/LacidMed/data")
+    anomyzer = Anonymizer(dicom_files=sorted_files, output_dir="/home/ralcala/Documents/FUESMEN/LacidMed/data/anom")
     anomyzer.anonymize()
     
     return 0
