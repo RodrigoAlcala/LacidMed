@@ -29,7 +29,8 @@ class DicomLoaderMRI:
         self.validate_directory(directory_path)
         self.directory_path = directory_path
         self._sorted_files = None
-        self._volumetric_array = None
+        self.volumetric_array = None
+        self.dcm_files = self.dicom_loader(self.sorted_files)
 
     def validate_directory(self, directory_path: str) -> None:
         """
@@ -111,7 +112,7 @@ class DicomLoaderMRI:
         """
         if self._volumetric_array is None:
             self._volumetric_array = self._generate_volumetric_array()
-        return self._volumetric_array
+        return self.volumetric_array
 
     def _generate_volumetric_array(self) -> np.ndarray:
         """

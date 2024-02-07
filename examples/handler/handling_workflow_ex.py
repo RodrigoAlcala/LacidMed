@@ -31,7 +31,7 @@ def main():
     sorted_files = loader.sorted_files
     
     anomyzer = Anonymizer(dicom_files=sorted_files, output_dir="/home/ralcala/Documents/FUESMEN/LacidMed/data/anom")
-    # anomyzer.anonymize()
+    #anomyzer.anonymize()
     
     return 0
 
