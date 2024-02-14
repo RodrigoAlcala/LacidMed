@@ -29,8 +29,8 @@ class DicomLoaderMRI:
         self.validate_directory(directory_path)
         self.directory_path = directory_path
         self._sorted_files = None
-        self.volumetric_array = None
-        self.dcm_files = self.dicom_loader(self.sorted_files)
+        self.volumetric_array = self.generate_volumetric_array()
+        self.dcm_files = []
 
     def validate_directory(self, directory_path: str) -> None:
         """
@@ -55,12 +55,9 @@ class DicomLoaderMRI:
         Returns:
             List[pydicom.Dataset]: A list of DICOM files read from the sorted file paths.
         """
-        dicom_files = []
-        for file in sorted_files:
-            try:
-                dicom_files.append(pydicom.dcmread(file))
-            except Exception as e:
-                logging.error(f"Error loading DICOM file: {file}. Error: {str(e)}")
+        dicom_files = [
+            pydicom.dcmread(file) for file in sorted_files if os.path.isfile(file)
+        ]
         return dicom_files
 
     @property
@@ -73,11 +70,13 @@ class DicomLoaderMRI:
         """
         if self._sorted_files is None:
             files = self._get_files()
-            files.sort(
-                key=lambda file: pydicom.dcmread(
+            instance_numbers = {}
+            for file in files:
+                instance_number = pydicom.dcmread(
                     file, stop_before_pixels=True
                 ).InstanceNumber
-            )
+                instance_numbers[file] = instance_number
+            files.sort(key=lambda file: instance_numbers[file])
             self._sorted_files = files
         return self._sorted_files
 
@@ -93,28 +92,22 @@ class DicomLoaderMRI:
             for file in sorted(pathlib.Path(self.directory_path).rglob("*.dcm")):
                 try:
                     dicom_files.append(str(file))
-                except (IOError, pydicom.errors.InvalidDicomError) as e:
-                    raise Exception(f"Error reading file: {file}. {str(e)}")
-        except IOError as e:
-            raise Exception(
+                except FileNotFoundError as e:
+                    raise FileNotFoundError(f"Error reading file: {file}. {str(e)}")
+                except PermissionError as e:
+                    raise PermissionError(f"Error reading file: {file}. {str(e)}")
+        except FileNotFoundError as e:
+            raise FileNotFoundError(
+                f"Error accessing directory: {self.directory_path}. {str(e)}"
+            )
+        except PermissionError as e:
+            raise PermissionError(
                 f"Error accessing directory: {self.directory_path}. {str(e)}"
             )
 
         return dicom_files
 
-    @property
-    def volumetric_array(self) -> np.ndarray:
-        """
-        Retrieves the volumetric array of the DICOM files.
-
-        Returns:
-            np.ndarray: The volumetric array of the DICOM files.
-        """
-        if self._volumetric_array is None:
-            self._volumetric_array = self._generate_volumetric_array()
-        return self.volumetric_array
-
-    def _generate_volumetric_array(self) -> np.ndarray:
+    def generate_volumetric_array(self) -> np.ndarray:
         """
         Generate a 3D stacked array of the volume.
 
@@ -125,3 +118,9 @@ class DicomLoaderMRI:
         dcm_matrices = [pydicom.dcmread(path).pixel_array for path in self.sorted_files]
         stacked_volume = np.dstack(dcm_matrices)
         return stacked_volume
+
+    def load_files(self):
+        """
+        Load DICOM files from the sorted file paths.
+        """
+        self.dcm_files = self.dicom_loader(self.sorted_files)
