@@ -29,7 +29,7 @@ def main():
     sorted_files = loader.sorted_files
     dcm_files = loader.dcm_files
     
-    filter = Filters(sequence_directory=sequence_dir, dicom_files=dcm_files)
+    filter = Filters(sequence_directory=sequence_dir, dicom_files=dcm_files, output_dir="/output")
     n4_files = filter.N4_bias_correction_filter()
         
     print(n4_files)
