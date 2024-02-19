@@ -5,7 +5,7 @@ import SimpleITK as sitk
 
 
 class Filters:
-    def __init__(self, sequence_directory: str, dicom_files: List[pydicom.Dataset]):
+    def __init__(self, sequence_directory: str, dicom_files: List[pydicom.Dataset], output_dir: str):
         """
         Initialize MyClass object.
         Args:
@@ -24,13 +24,15 @@ class Filters:
             raise ValueError("Invalid directory path: {}".format(sequence_directory))
         if not isinstance(dicom_files, list):
             raise TypeError("`dicom_files` must be a list.")
-        if not dicom_files:
-            raise ValueError("dicom_files cannot be empty")
         for file in dicom_files:
             if not isinstance(file, pydicom.Dataset):
                 raise ValueError(
                     "All elements in `dicom_files` must be instances of `pydicom.Dataset`."
                 )
+        if not os.path.exists(output_dir) or not os.access(output_dir, os.W_OK):
+            raise ValueError("Output directory does not exist or is not writable")
+        
+        self.output_dir = output_dir
         self.dicom_files = dicom_files
         self.sequence_directory = sequence_directory
 
@@ -105,7 +107,7 @@ class Filters:
 
         sitk.WriteImage(
             corrected_image_full_res,
-            os.path.join(self.sequence_directory, "n4_corrected.nrrd"),
+            os.path.join(self.output_dir, "n4_corrected.nrrd"),
         )
 
         return corrected_image_full_res
