@@ -1,3 +1,4 @@
+import numpy as np
 import os
 import pydicom
 from typing import List
@@ -7,16 +8,18 @@ import SimpleITK as sitk
 class Filters:
     def __init__(self, sequence_directory: str, dicom_files: List[pydicom.Dataset], output_dir: str):
         """
-        Initialize MyClass object.
+        Initialize Filters object.
         Args:
             sequence_directory (str): The directory path for the sequence.
             dicom_files (List[pydicom.Dataset]): List of DICOM files.
+            output_dir (str): The output directory path.
         Raises:
             ValueError: If `sequence_directory` is not a valid directory path.
             ValueError: If `dicom_files` is an empty list.
             ValueError: If any item in `dicom_files` is not an instance of `pydicom.Dataset`.
             TypeError: If `sequence_directory` is not a string.
             TypeError: If `dicom_files` is not a list.
+            ValueError: If `output_dir` does not exist or is not writable.
         """
         if not isinstance(sequence_directory, str):
             raise TypeError("sequence_directory must be a string")
@@ -36,7 +39,7 @@ class Filters:
         self.dicom_files = dicom_files
         self.sequence_directory = sequence_directory
 
-    def resample_image(self, itk_image, new_spacing=[1.0, 1.0, 1.0], is_label=False):
+    def resample_image(self, itk_image, new_spacing: List[float] = [1.0, 1.0, 1.0], is_label: bool = False) -> sitk.Image:
         """
         Resample the input image to a new spacing.
 
@@ -71,8 +74,8 @@ class Filters:
         return resampler.Execute(itk_image)
 
     def N4_bias_correction_filter(
-        self, mask_image=None, convergence_threshold=0.001, max_iterations=[3, 3, 3]
-    ):
+        self, mask_image = None, convergence_threshold: float = 0.001, max_iterations: List[int] = [3, 3, 3]
+    ) -> sitk.Image:
         """
         Apply N4 bias correction to the input image.
 
@@ -111,3 +114,22 @@ class Filters:
         )
 
         return corrected_image_full_res
+
+    def normalize_image_filter(self, image_arr: np.ndarray, as_array: bool = False):
+        """
+        Normalize the input image.
+
+        Args:
+            image_arr: The input image as a numpy array.
+            as_array: Whether to return the normalized image as a numpy array.
+
+        Returns:
+            The normalized image as a SimpleITK image or numpy array.
+        """
+        if not isinstance(image_arr, np.ndarray):
+            raise ValueError("Invalid input: image_arr must be a numpy array.")
+        image = sitk.GetImageFromArray(image_arr)
+        image = sitk.RescaleIntensity(image, 0, 255)
+        if as_array:
+            image = sitk.GetArrayFromImage(image)
+        return image
