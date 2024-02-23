@@ -6,7 +6,12 @@ import SimpleITK as sitk
 
 
 class Filters:
-    def __init__(self, sequence_directory: str, dicom_files: List[pydicom.Dataset], output_dir: str):
+    def __init__(
+        self,
+        sequence_directory: str,
+        dicom_files: List[pydicom.Dataset],
+        output_dir: str,
+    ):
         """
         Initialize Filters object.
         Args:
@@ -34,12 +39,17 @@ class Filters:
                 )
         if not os.path.exists(output_dir) or not os.access(output_dir, os.W_OK):
             raise ValueError("Output directory does not exist or is not writable")
-        
+
         self.output_dir = output_dir
         self.dicom_files = dicom_files
         self.sequence_directory = sequence_directory
 
-    def resample_image(self, itk_image, new_spacing: List[float] = [1.0, 1.0, 1.0], is_label: bool = False) -> sitk.Image:
+    def resample_image(
+        self,
+        itk_image,
+        new_spacing: List[float] = [1.0, 1.0, 1.0],
+        is_label: bool = False,
+    ) -> sitk.Image:
         """
         Resample the input image to a new spacing.
 
@@ -74,7 +84,10 @@ class Filters:
         return resampler.Execute(itk_image)
 
     def N4_bias_correction_filter(
-        self, mask_image = None, convergence_threshold: float = 0.001, max_iterations: List[int] = [3, 3, 3]
+        self,
+        mask_image=None,
+        convergence_threshold: float = 0.001,
+        max_iterations: List[int] = [3, 3, 3],
     ) -> sitk.Image:
         """
         Apply N4 bias correction to the input image.
