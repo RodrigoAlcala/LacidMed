@@ -7,7 +7,14 @@ class HistogramGenerator:
         self.array_2D = array_2D if array_2D is not None else None
         self.array_3D = array_3D if array_3D is not None else None
 
-    def create_histogram_2D(self, offset: int = 0, show: bool = True, plot_title: str = "", xlabel: str = "", ylabel: str = ""):
+    def create_histogram_2D(
+        self,
+        offset: int = 0,
+        show: bool = True,
+        plot_title: str = "",
+        xlabel: str = "",
+        ylabel: str = "",
+    ):
         """
         Generates a 2D histogram from the provided 2D array and returns the bins and frequencies.
 
@@ -44,7 +51,14 @@ class HistogramGenerator:
 
         return hist, bins
 
-    def create_histogram_of_3d_array(self, offset: int = 0, show: bool = True, plot_title: str = "", xlabel: str = "", ylabel: str = ""):
+    def create_histogram_of_3d_array(
+        self,
+        offset: int = 0,
+        show: bool = True,
+        plot_title: str = "",
+        xlabel: str = "",
+        ylabel: str = "",
+    ):
         """
         Generates a 3D histogram from the provided 3D array and returns the bins and frequencies.
 
