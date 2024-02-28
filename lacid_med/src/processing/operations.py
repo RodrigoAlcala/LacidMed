@@ -8,25 +8,35 @@ import pydicom
 class Operations:
     def __init__(
         self, 
-        input_directory: str = None, 
+        input_directory1: str = None,
+        input_directory2: str = None, 
         output_directory: str = None
     ):
         
         """
         Initializes operations object.
         Args:
-            input_directory (str): Path to the input directory.
+            input_directory1 (str): Path to the input directory 1.
+            input_directory2 (str): Path to the input directory 2.
             output_directory (str): Path to the output directory.
         """
 
-        if not isinstance(input_directory, str):
+        if not isinstance(input_directory1, str) and input_directory1 is not None:
             raise TypeError("input_directory must be a string")
-        if not os.path.isdir(input_directory):
-            raise ValueError("Invalid directory path: {}".format(input_directory))
-        if not os.path.exists(output_directory) or not os.access(output_directory, os.W_OK):
-            raise ValueError("Output directory does not exist or is not writable")
+        if input_directory1 is not None:
+            if not os.path.isdir(input_directory1):
+                raise ValueError("Invalid directory path: {}".format(input_directory1))
+        if not isinstance(input_directory2, str) and input_directory2 is not None:
+            raise TypeError("input_directory must be a string")
+        if input_directory2 is not None:
+            if not os.path.isdir(input_directory2):
+                raise ValueError("Invalid directory path: {}".format(input_directory2))
+        if output_directory is not None:
+            if not os.path.exists(output_directory) or not os.access(output_directory, os.W_OK):
+                raise ValueError("Output directory does not exist or is not writable")
 
-        self.input_directory = input_directory
+        self.input_directory1 = input_directory1
+        self.input_directory2 = input_directory2
         self.output_directory = output_directory
     
 
