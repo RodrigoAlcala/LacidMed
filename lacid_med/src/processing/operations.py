@@ -40,13 +40,14 @@ class Operations:
         self.output_directory = output_directory
     
 
-    def imageDiff(self, inputPath1, inputPath2):  
+    def imageDiff(self, inputPath1, inputPath2, clipping: bool = False):  
         """
-        Substract two images and return the difference in pixel values.
+        Substract two images and return the difference in pixel values. If 
 
         Args:
             inputPath1 (str): Path to the first image.
             inputPath2 (str): Path to the second image.
+            clipping (bool): Whether to use clipping to set negative values to 0.
 
         Returns:
             The difference in pixel values between the two images.
@@ -54,7 +55,10 @@ class Operations:
         """
         image1 = pydicom.dcmread(inputPath1) # path de la imagen 1.
         image2 = pydicom.dcmread(inputPath2) # path de la imagen 2.
-        pixelArrayDiff = image2.pixel_array - image1.pixel_array
-        pixelArrayDiff = np.abs(pixelArrayDiff)
+        pixelArrayDiff = image1.pixel_array - image2.pixel_array
+        if clipping:
+            pixelArrayDiff[pixelArrayDiff < 0] = 0
+        else:
+            pixelArrayDiff = np.abs(pixelArrayDiff)
         return pixelArrayDiff
         
