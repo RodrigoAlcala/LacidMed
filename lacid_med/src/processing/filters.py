@@ -269,3 +269,44 @@ class Filters:
             return image
         except Exception as e:
             raise ValueError("Error during Laplacian image filtering: {}".format(str(e)))
+        
+    def fourier_transform_filter(self, img_arr: np.ndarray):
+        """
+        Apply Fourier Transform image filtering to the input image array.
+
+        Args:
+            img_arr (np.ndarray): The input image array.
+                - Must be a numpy array.
+                - Must not be empty.
+                - Must be a 2D or 3D numpy array.
+                - Must have data type uint8.
+
+        Returns:
+            sitk.Image: The filtered image as a SimpleITK image.
+
+        Raises:
+            ValueError: If `img_arr` is not a numpy array.
+            ValueError: If `img_arr` is empty.
+            ValueError: If `img_arr` is not a 2D or 3D numpy array.
+            ValueError: If `img_arr` does not have data type uint8.
+            ValueError: If an error occurs during Fourier Transform image filtering.
+
+        """
+        if not isinstance(img_arr, np.ndarray):
+            raise ValueError("Invalid input: img_arr must be a numpy array.")
+
+        if img_arr.size == 0:
+            raise ValueError("Invalid input: img_arr is empty.")
+
+        if len(img_arr.shape) != 2 and len(img_arr.shape) != 3:
+            raise ValueError("Invalid input: img_arr must be a 2D or 3D numpy array.")
+
+        if img_arr.dtype != np.uint8:
+            raise ValueError("Invalid input: img_arr must have data type uint8.")
+
+        try:
+            image = sitk.GetImageFromArray(img_arr)
+            image = sitk.FourierTransformImageFilter().Execute(image)
+            return image
+        except Exception as e:
+            raise ValueError("Error during Fourier Transform image filtering: {}".format(str(e)))
