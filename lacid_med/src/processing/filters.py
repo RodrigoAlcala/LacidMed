@@ -141,9 +141,9 @@ class Filters:
         """
         if not isinstance(image_arr, np.ndarray):
             raise ValueError("Invalid input: image_arr must be a numpy array.")
-        image = sitk.GetImageFromArray(image_arr)
+        image = sitk.Cast(sitk.GetImageFromArray(image_arr), sitk.sitkFloat32)
         image = sitk.RescaleIntensity(image, 0, 255)
-        return image
+        return sitk.GetArrayFromImage(image)
     
     def gaussian_image_filter(self, img_arr: np.ndarray) -> sitk.Image:
         """
@@ -157,9 +157,9 @@ class Filters:
         """
         if not isinstance(img_arr, np.ndarray):
             raise ValueError("Invalid input: img_arr must be a numpy array.")
-        image = sitk.GetImageFromArray(img_arr)
+        image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
         image = sitk.SmoothingRecursiveGaussian(image, sigma=1.0)
-        return image
+        return sitk.GetArrayFromImage(image)
 
     def median_image_filter(self, img_arr: np.ndarray):
         """
@@ -176,9 +176,9 @@ class Filters:
         if img_arr.size == 0:
             raise ValueError("Invalid input: img_arr is empty.")
         try:
-            image = sitk.GetImageFromArray(img_arr)
+            image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
             image = sitk.MedianImageFilter().Execute(image)
-            return image
+            return sitk.GetArrayFromImage(image)
         except Exception as e:
             raise ValueError("Error during median image filtering: {}".format(str(e)))
     
@@ -201,13 +201,14 @@ class Filters:
         if lower_threshold > upper_threshold:
             raise ValueError("Invalid threshold values: lower_threshold must be less than or equal to upper_threshold.")
         try:
-            image = sitk.GetImageFromArray(img_arr)
+            image = sitk.GetImageFromArray(img_arr.astype(sitk.sitkFloat32))
             thresholder = sitk.BinaryThresholdImageFilter()
             thresholder.SetLowerThreshold(lower_threshold)
             thresholder.SetUpperThreshold(upper_threshold)
             thresholder.SetInsideValue(inside_value)
             thresholder.SetOutsideValue(outside_value)
             image = thresholder.Execute(image)
+            image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
             return image
         except Exception as e:
             raise ValueError("Error during binary thresholding: {}".format(str(e)))
@@ -231,13 +232,10 @@ class Filters:
         if len(img_arr.shape) != 2 and len(img_arr.shape) != 3:
             raise ValueError("Invalid input: img_arr must be a 2D or 3D numpy array.")
 
-        if img_arr.dtype != np.uint8:
-            raise ValueError("Invalid input: img_arr must have data type uint8.")
-
         try:
-            image = sitk.GetImageFromArray(img_arr)
+            image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
             image = sitk.SobelEdgeDetectionImageFilter().Execute(image)
-            return image
+            return sitk.GetArrayFromImage(image)
         except Exception as e:
             raise ValueError("Error during Sobel image filtering: {}".format(str(e)))
     
@@ -260,13 +258,10 @@ class Filters:
         if len(img_arr.shape) != 2 and len(img_arr.shape) != 3:
             raise ValueError("Invalid input: img_arr must be a 2D or 3D numpy array.")
 
-        if img_arr.dtype != np.uint8:
-            raise ValueError("Invalid input: img_arr must have data type uint8.")
-
         try:
-            image = sitk.GetImageFromArray(img_arr)
+            image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
             image = sitk.LaplacianImageFilter().Execute(image)
-            return image
+            return sitk.GetArrayFromImage(image)
         except Exception as e:
             raise ValueError("Error during Laplacian image filtering: {}".format(str(e)))
         
@@ -301,12 +296,9 @@ class Filters:
         if len(img_arr.shape) != 2 and len(img_arr.shape) != 3:
             raise ValueError("Invalid input: img_arr must be a 2D or 3D numpy array.")
 
-        if img_arr.dtype != np.uint8:
-            raise ValueError("Invalid input: img_arr must have data type uint8.")
-
         try:
-            image = sitk.GetImageFromArray(img_arr)
-            image = sitk.FourierTransformImageFilter().Execute(image)
+            image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
+            image = sitk.ForwardFFT(image)
             return image
         except Exception as e:
             raise ValueError("Error during Fourier Transform image filtering: {}".format(str(e)))
