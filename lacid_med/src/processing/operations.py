@@ -8,57 +8,81 @@ import pydicom
 class Operations:
     def __init__(
         self, 
-        input_directory1: str = None,
-        input_directory2: str = None, 
-        output_directory: str = None
+        volumetric_array_1: np.ndarray = None,
+        volumetric_array_2: np.ndarray = None, 
     ):
-        
         """
         Initializes operations object.
         Args:
-            input_directory1 (str): Path to the input directory 1.
-            input_directory2 (str): Path to the input directory 2.
-            output_directory (str): Path to the output directory.
+            volumetric_array_1 (np.ndarray): first volumetric array.
+            volumetric_array_2 (np.ndarray): second volumetric array.
+        Raises:
+            TypeError: If volumetric_array_1 or volumetric_array_2 is not a numpy array.
         """
-
-        if not isinstance(input_directory1, str) and input_directory1 is not None:
-            raise TypeError("input_directory must be a string")
-        if input_directory1 is not None:
-            if not os.path.isdir(input_directory1):
-                raise ValueError("Invalid directory path: {}".format(input_directory1))
-        if not isinstance(input_directory2, str) and input_directory2 is not None:
-            raise TypeError("input_directory must be a string")
-        if input_directory2 is not None:
-            if not os.path.isdir(input_directory2):
-                raise ValueError("Invalid directory path: {}".format(input_directory2))
-        if output_directory is not None:
-            if not os.path.exists(output_directory) or not os.access(output_directory, os.W_OK):
-                raise ValueError("Output directory does not exist or is not writable")
-
-        self.input_directory1 = input_directory1
-        self.input_directory2 = input_directory2
-        self.output_directory = output_directory
+         
+        if not isinstance(volumetric_array_1, np.ndarray) and volumetric_array_1 is not None:
+            raise TypeError("volumetric_array_1 must be a numpy array")
+        
+        if not isinstance(volumetric_array_2, np.ndarray) and volumetric_array_2 is not None:
+            raise TypeError("volumetric_array_2 must be a numpy array")
+        
+        self.volumetric_array_1 = volumetric_array_1
+        self.volumetric_array_2 = volumetric_array_2
     
 
-    def imageDiff(self, inputPath1, inputPath2, clipping: bool = False):  
+    def image_difference(self, pixel_array_1: np.ndarray, pixel_array_2: np.ndarray, clipping: bool = False):  
         """
-        Substract two images and return the difference in pixel values. If 
-
+        Substract two images and return the difference in pixel values. If clipping is set to True, negative values are set to 0.
         Args:
-            inputPath1 (str): Path to the first image.
-            inputPath2 (str): Path to the second image.
-            clipping (bool): Whether to use clipping to set negative values to 0.
+            pixel_array_1 (np.ndarray): pixel array of the first image.
+            pixel_array_2 (np.ndarray): pixel array of the second image.
+            clipping (bool, optional): Whether to use clipping to set negative values to 0.
 
         Returns:
             The difference in pixel values between the two images.
-        
         """
-        image1 = pydicom.dcmread(inputPath1) # path de la imagen 1.
-        image2 = pydicom.dcmread(inputPath2) # path de la imagen 2.
-        pixelArrayDiff = image1.pixel_array - image2.pixel_array
-        if clipping:
-            pixelArrayDiff[pixelArrayDiff < 0] = 0
+        if pixel_array_1.shape != pixel_array_2.shape:
+            raise ValueError("pixel arrays must have the same shape")
         else:
-            pixelArrayDiff = np.abs(pixelArrayDiff)
-        return pixelArrayDiff
+            pixel_array_diff = pixel_array_1 - pixel_array_2
+            if clipping:
+                pixel_array_diff[pixel_array_diff < 0] = 0
+            else:
+                pixel_array_diff = np.abs(pixel_array_diff)
+        return pixel_array_diff
+    
+    def volume_difference(self, image_number: int = None, clipping: bool = False):
+        """ 
+        Substract the second volumetric array from the first volumetric array and return the difference in pixel values, slice per slice. 
+        If clipping is set to True, negative values are set to 0.
+        Args:
+            image_number (int, optional): The number of the image to use in case a single image is needed.
+            clipping (bool, optional): Whether to use clipping to set negative values to 0. Defaults to False.
+
+        Returns:
+            The difference in pixel values between the two images.
+        """
+        if self.volumetric_array_1.shape != self.volumetric_array_2.shape:
+            raise ValueError("volumetric arrays must have the same shape")
+        else:
+            if image_number is None:
+                vol_array_diff = self.volumetric_array_1 - self.volumetric_array_2
+                if clipping:
+                    vol_array_diff[vol_array_diff < 0] = 0
+                else:
+                    vol_array_diff = np.abs(vol_array_diff)
+                return vol_array_diff
+            elif image_number not in range(0, self.volumetric_array_1.shape[2]):
+                raise ValueError("image_number must be in range 0 to " + str(self.volumetric_array_1.shape[2]))
+            elif image_number is not None:
+                pixel_array_1 = self.volumetric_array_1[:, :,image_number]
+                pixel_array_2 = self.volumetric_array_2[:, :,image_number]
+                pixel_array_diff = self.image_difference(pixel_array_1, pixel_array_2, clipping)
+            return pixel_array_diff
+        
+        
+
+
+            
+
         
