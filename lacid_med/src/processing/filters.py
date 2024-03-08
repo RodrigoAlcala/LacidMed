@@ -72,7 +72,7 @@ class Filters:
             The bias-corrected image.
         """
         image = sitk.ImageSeriesReader()
-        image.SetFileNames(image.GetGDCMSeriesFileNames(sequence_directory))
+        image.SetFileNames(image.GetGDCMSeriesFileNames(self.sequence_directory))
         image = image.Execute()
         
         image = sitk.Cast(self.image, sitk.sitkFloat32)
