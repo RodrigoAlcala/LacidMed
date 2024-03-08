@@ -32,13 +32,13 @@ def main():
 
     filter = Filters()
 
-    normalized_img = filter.normalize_image_filter(img_arr)
+    #normalized_img = filter.normalize_image_filter(img_arr)
     #plotter.plot_single_file(normalized_img)
 
-    gaussian_img = filter.gaussian_image_filter(img_arr, sigma=3.0)
+    #gaussian_img = filter.gaussian_image_filter(img_arr, sigma=3.0)
     #plotter.plot_single_file(gaussian_img)
 
-    median_img = filter.median_image_filter(img_arr)
+    #median_img = filter.median_image_filter(img_arr)
     #plotter.plot_single_file(median_img)
 
     binary_img = filter.binary_threshold_image_filter(
@@ -57,7 +57,10 @@ def main():
     #plotter.plot_single_file(laplacian_img)
     
     fourier_img = filter.fourier_transform_filter(img_arr)
-    plotter.plot_single_file(fourier_img)
+    #plotter.plot_single_file(fourier_img)
+    
+    inv_fourier_img = filter.inverse_fourier_trasform_filter(fourier_img)
+    plotter.plot_single_file(inv_fourier_img)
     
     return
 

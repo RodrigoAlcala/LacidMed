@@ -3,7 +3,7 @@ import os
 import pydicom
 from typing import List
 import SimpleITK as sitk
-
+import scipy.fft
 
 class Filters:
     def __init__(
@@ -251,25 +251,13 @@ class Filters:
 
     def fourier_transform_filter(self, img_arr: np.ndarray):
         """
-        Apply Fourier Transform image filtering to the input image array.
+        Apply Fourier transform to the input image array.
 
         Args:
             img_arr (np.ndarray): The input image array.
-                - Must be a numpy array.
-                - Must not be empty.
-                - Must be a 2D or 3D numpy array.
-                - Must have data type uint8.
 
         Returns:
-            sitk.Image: The filtered image as a SimpleITK image.
-
-        Raises:
-            ValueError: If `img_arr` is not a numpy array.
-            ValueError: If `img_arr` is empty.
-            ValueError: If `img_arr` is not a 2D or 3D numpy array.
-            ValueError: If `img_arr` does not have data type uint8.
-            ValueError: If an error occurs during Fourier Transform image filtering.
-
+            np.ndarray: The filtered image array.
         """
         if not isinstance(img_arr, np.ndarray):
             raise ValueError("Invalid input: img_arr must be a numpy array.")
@@ -277,14 +265,12 @@ class Filters:
         if img_arr.size == 0:
             raise ValueError("Invalid input: img_arr is empty.")
 
-        if len(img_arr.shape) != 2 and len(img_arr.shape) != 3:
-            raise ValueError("Invalid input: img_arr must be a 2D or 3D numpy array.")
-
         try:
-            image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
-            image = sitk.InverseFFT(image)
-            return sitk.GetArrayFromImage(image)
+            kspace = scipy.fft.fft2(img_arr)
+            return np.log(np.abs(scipy.fft.fftshift(kspace)))
         except Exception as e:
-            raise ValueError(
-                "Error during Fourier Transform image filtering: {}".format(str(e))
-                )
+            raise ValueError("Error during Fourier transform: {}".format(str(e)))
+        
+    def inverse_fourier_trasform_filter(self, kspace_arr: np.ndarray):
+        magnitude_space = np.abs(np.fft.ifft2(kspace_arr))
+        return self.normalize_image_filter(magnitude_space)
