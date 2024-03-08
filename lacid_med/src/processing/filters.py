@@ -8,52 +8,23 @@ import SimpleITK as sitk
 class Filters:
     def __init__(
         self,
-        sequence_directory: str,
-        dicom_files: List[pydicom.Dataset],
-        output_dir: str,
+        sequence_directory: str = None,
+        output_dir: str = None,
     ):
-        """
-        Initialize Filters object.
-        Args:
-            sequence_directory (str): The directory path for the sequence.
-            dicom_files (List[pydicom.Dataset]): List of DICOM files.
-            output_dir (str): The output directory path.
-        Raises:
-            ValueError: If `sequence_directory` is not a valid directory path.
-            ValueError: If `dicom_files` is an empty list.
-            ValueError: If any item in `dicom_files` is not an instance of `pydicom.Dataset`.
-            TypeError: If `sequence_directory` is not a string.
-            TypeError: If `dicom_files` is not a list.
-            ValueError: If `output_dir` does not exist or is not writable.
-            TypeError: If `output_dir` is not a string.
-        """
-        if not isinstance(sequence_directory, str):
-            raise TypeError("sequence_directory must be a string")
-        if not os.path.isdir(sequence_directory):
-            raise ValueError("Invalid directory path: {}".format(sequence_directory))
-        if not isinstance(dicom_files, list):
-            raise TypeError("`dicom_files` must be a list.")
-        for file in dicom_files:
-            if not isinstance(file, pydicom.Dataset):
-                raise ValueError(
-                    "All elements in `dicom_files` must be instances of `pydicom.Dataset`."
-                )
-        if not isinstance(output_dir, str):
-            raise TypeError("output_dir must be a string")
-        if not os.path.exists(output_dir) or not os.access(output_dir, os.W_OK):
-            raise ValueError("Output directory does not exist or is not writable")
 
-        self.output_dir = output_dir
-        self.dicom_files = dicom_files
         self.sequence_directory = sequence_directory
+        self.output_dir = output_dir
+
+        self.resampler = sitk.ResampleImageFilter()
+        
 
     def resample_image(
         self,
         itk_image,
         new_spacing: List[float] = [1.0, 1.0, 1.0],
         is_label: bool = False,
-        interpolator: int = sitk.sitkBSpline
-    ) -> sitk.Image:
+        interpolator: int = sitk.sitkBSpline,
+    ) -> np.ndarray:
         """
         Resample the input image to a new spacing.
 
@@ -73,16 +44,15 @@ class Filters:
             int(round(osz * ospc / nspc))
             for osz, ospc, nspc in zip(original_size, original_spacing, new_spacing)
         ]
-        resampler = sitk.ResampleImageFilter()
-        resampler.SetOutputSpacing(new_spacing)
-        resampler.SetSize(new_size)
-        resampler.SetOutputDirection(itk_image.GetDirection())
-        resampler.SetOutputOrigin(itk_image.GetOrigin())
-        resampler.SetTransform(sitk.Transform())
-        resampler.SetDefaultPixelValue(itk_image.GetPixelIDValue())
-        resampler.SetInterpolator(interpolator)
+        self.resampler.SetOutputSpacing(new_spacing)
+        self.resampler.SetSize(new_size)
+        self.resampler.SetOutputDirection(itk_image.GetDirection())
+        self.resampler.SetOutputOrigin(itk_image.GetOrigin())
+        self.resampler.SetTransform(sitk.Transform())
+        self.resampler.SetDefaultPixelValue(itk_image.GetPixelIDValue())
+        self.resampler.SetInterpolator(interpolator)
 
-        return resampler.Execute(itk_image)
+        return sitk.GetArrayFromImage(self.resampler.Execute(itk_image))
 
     def N4_bias_correction_filter(
         self,
@@ -101,12 +71,17 @@ class Filters:
         Returns:
             The bias-corrected image.
         """
-        reader = sitk.ImageSeriesReader()
-        reader.SetFileNames(reader.GetGDCMSeriesFileNames(self.sequence_directory))
-        image = reader.Execute()
-        image = sitk.Cast(image, sitk.sitkFloat32)
-
+        image = sitk.ImageSeriesReader()
+        image.SetFileNames(image.GetGDCMSeriesFileNames(sequence_directory))
+        image = image.Execute()
+        
+        image = sitk.Cast(self.image, sitk.sitkFloat32)
         image = self.resample_image(image)
+        image = (
+            sitk.GetImageFromArray(image)
+            if not isinstance(image, sitk.Image)
+            else image
+        )
 
         corrector = sitk.N4BiasFieldCorrectionImageFilter()
         corrector.SetMaximumNumberOfIterations(max_iterations)
@@ -122,14 +97,11 @@ class Filters:
         log_bias_field = corrector.GetLogBiasFieldAsImage(image)
         corrected_image_full_res = n4_filtered_image / sitk.Exp(log_bias_field)
 
-        sitk.WriteImage(
-            corrected_image_full_res,
-            os.path.join(self.output_dir, "n4_corrected.nrrd"),
-        )
+        corrected_array = sitk.GetArrayFromImage(corrected_image_full_res)
 
-        return corrected_image_full_res
+        return corrected_array
 
-    def normalize_image_filter(self, image_arr: np.ndarray):
+    def normalize_image_filter(self, image_arr: np.ndarray) -> np.ndarray:
         """
         Normalize the input image.
 
@@ -144,8 +116,8 @@ class Filters:
         image = sitk.Cast(sitk.GetImageFromArray(image_arr), sitk.sitkFloat32)
         image = sitk.RescaleIntensity(image, 0, 255)
         return sitk.GetArrayFromImage(image)
-    
-    def gaussian_image_filter(self, img_arr: np.ndarray) -> sitk.Image:
+
+    def gaussian_image_filter(self, img_arr: np.ndarray, sigma: float) -> np.ndarray:
         """
         Apply a Gaussian filter to the input image.
 
@@ -158,10 +130,10 @@ class Filters:
         if not isinstance(img_arr, np.ndarray):
             raise ValueError("Invalid input: img_arr must be a numpy array.")
         image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
-        image = sitk.SmoothingRecursiveGaussian(image, sigma=1.0)
+        image = sitk.SmoothingRecursiveGaussian(image, sigma=sigma)
         return sitk.GetArrayFromImage(image)
 
-    def median_image_filter(self, img_arr: np.ndarray):
+    def median_image_filter(self, img_arr: np.ndarray) -> np.ndarray:
         """
         Apply median filter to the input image.
 
@@ -181,8 +153,15 @@ class Filters:
             return sitk.GetArrayFromImage(image)
         except Exception as e:
             raise ValueError("Error during median image filtering: {}".format(str(e)))
-    
-    def binary_threshold(self, img_arr: np.ndarray, lower_threshold: int = 0, upper_threshold: int = 1, inside_value: int = 1, outside_value: int = 0):
+
+    def binary_threshold_image_filter(
+        self,
+        img_arr: np.ndarray,
+        lower_threshold: int = 0,
+        upper_threshold: int = 1,
+        inside_value: int = 1,
+        outside_value: int = 0,
+    ) -> np.ndarray:
         """
         Apply binary thresholding to the input image array.
 
@@ -199,9 +178,12 @@ class Filters:
         if not isinstance(img_arr, np.ndarray):
             raise ValueError("Invalid input: img_arr must be a numpy array.")
         if lower_threshold > upper_threshold:
-            raise ValueError("Invalid threshold values: lower_threshold must be less than or equal to upper_threshold.")
+            raise ValueError(
+                "Invalid threshold values: lower_threshold must be less than or equal to upper_threshold."
+            )
         try:
-            image = sitk.GetImageFromArray(img_arr.astype(sitk.sitkFloat32))
+            image = sitk.GetImageFromArray(img_arr)
+            image = sitk.Cast(image, sitk.sitkFloat32)
             thresholder = sitk.BinaryThresholdImageFilter()
             thresholder.SetLowerThreshold(lower_threshold)
             thresholder.SetUpperThreshold(upper_threshold)
@@ -209,7 +191,7 @@ class Filters:
             thresholder.SetOutsideValue(outside_value)
             image = thresholder.Execute(image)
             image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
-            return image
+            return sitk.GetArrayFromImage(image)
         except Exception as e:
             raise ValueError("Error during binary thresholding: {}".format(str(e)))
 
@@ -238,7 +220,7 @@ class Filters:
             return sitk.GetArrayFromImage(image)
         except Exception as e:
             raise ValueError("Error during Sobel image filtering: {}".format(str(e)))
-    
+
     def laplacian_image_filter(self, img_arr: np.ndarray):
         """
         Apply Laplacian image filter to the input image array.
@@ -263,8 +245,10 @@ class Filters:
             image = sitk.LaplacianImageFilter().Execute(image)
             return sitk.GetArrayFromImage(image)
         except Exception as e:
-            raise ValueError("Error during Laplacian image filtering: {}".format(str(e)))
-        
+            raise ValueError(
+                "Error during Laplacian image filtering: {}".format(str(e))
+            )
+
     def fourier_transform_filter(self, img_arr: np.ndarray):
         """
         Apply Fourier Transform image filtering to the input image array.
@@ -298,7 +282,9 @@ class Filters:
 
         try:
             image = sitk.Cast(sitk.GetImageFromArray(img_arr), sitk.sitkFloat32)
-            image = sitk.ForwardFFT(image)
-            return image
+            image = sitk.InverseFFT(image)
+            return sitk.GetArrayFromImage(image)
         except Exception as e:
-            raise ValueError("Error during Fourier Transform image filtering: {}".format(str(e)))
+            raise ValueError(
+                "Error during Fourier Transform image filtering: {}".format(str(e))
+                )

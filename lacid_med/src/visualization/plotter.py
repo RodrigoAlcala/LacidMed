@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from typing import List
 
 class DicomPlotter:
-    def __init__(self, dicom_files: List[str]) -> None:
-        self.dicom_files = dicom_files
+    def __init__(self) -> None:
+        self.dicom_files = None
 
     def _show_image(self, arr: np.ndarray, show: bool = True):
         """
@@ -27,14 +27,18 @@ class DicomPlotter:
         return plt_images
 
     def plot_all_files(self):
+        
         def load_and_plot_images():
             for dicom in self.dicom_files:
                 ds = pydicom.dcmread(dicom)
                 yield ds.pixel_array
 
-        for pixel_array in load_and_plot_images():
-            self._show_image(pixel_array)
+        if self.dicom_files is None:
+            return
+        else:
+            for pixel_array in load_and_plot_images():
+                self._show_image(pixel_array)
 
-    def plot_single_file(self, img_num_input: int):
-        ds = pydicom.dcmread(self.dicom_files[img_num_input])
-        self._show_image(ds.pixel_array)
+
+    def plot_single_file(self, img_arr:np.ndarray):
+        return self._show_image(img_arr)
