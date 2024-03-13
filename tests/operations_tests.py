@@ -11,6 +11,9 @@ from lacid_med.src.visualization.plotter import DicomPlotter
 from lacid_med.src.handler.loader import DicomLoaderMRI
 from lacid_med.src.handler.writer import MultipleFileWriter
 
+
+# np.set_printoptions(threshold=sys.maxsize)
+
 def main():
 
     # test using two paths pointing to one image each.
@@ -24,12 +27,14 @@ def main():
     
     operations_1 = Operations(image_1_array, image_2_array)
     
+    diff = operations_1.image_difference(image_2_array, image_1_array, clipping=False)
+
     plotter_1 = DicomPlotter(paths)
-    plotter_1.plot_all_files()
-    diff = operations_1.image_difference(image_2_array, image_1_array, clipping=True)
+    plotter_1._show_image(image_1_array)
+    plotter_1._show_image(image_2_array)
     plotter_1._show_image(diff)
-    
-    
+
+        
     # test using two directories.
     directory_1 = "C:/Users/santi/Desktop/Fuesmen/imagenes/ZTE_H01_descomp"
     loader_1 = DicomLoaderMRI(directory_1)
@@ -43,7 +48,7 @@ def main():
 
     operations_2 = Operations(vol_array_2, vol_array_1)
     
-    volume_diff = operations_2.volume_difference(image_number=89, clipping=True)
+    volume_diff = operations_2.volume_difference(image_number=89, clipping=False)
     
     plotter_2._show_image(volume_diff)
     
