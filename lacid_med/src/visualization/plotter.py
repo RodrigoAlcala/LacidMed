@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from typing import List
 
 class DicomPlotter:
-    def __init__(self) -> None:
+    def __init__(self, dicom_files: List[str]) -> None:
         self.dicom_files = None
 
     def _show_image(self, arr: np.ndarray, show: bool = True):

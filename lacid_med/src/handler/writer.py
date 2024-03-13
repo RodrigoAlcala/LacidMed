@@ -3,6 +3,7 @@ import os
 import pydicom
 import numpy as np
 from typing import List
+import re
 
 
 class SingleFileWriter:
@@ -77,3 +78,41 @@ class MultipleFileWriter:
 
         with multiprocessing.Pool() as pool:
             pool.map(process_file, self.dicom_files)
+
+
+class Deanonymizer:
+    def __init__(self, old_directory: str, new_directory: str, output_directory: str) -> None:
+        self.old_directory = old_directory
+        self.new_directory = new_directory
+        self.output_directory = output_directory
+        
+    def numericalSort(self, value):
+        numbers = re.compile(r'(\d+)')
+        parts = numbers.split(value)
+        parts[1::2] = map(int, parts[1::2])
+        return parts
+
+    def deanonymizer(self, output_name: str = None) -> None:
+        if not os.path.exists(self.output_directory):
+            os.mkdir(self.output_directory)
+            print("Output directory created in path.")
+        old_files = []
+        for file in sorted(os.listdir(self.old_directory), key=self.numericalSort):    
+            old_path = self.old_directory + "/" + str(file)
+            old_files.append(old_path)
+        new_files = []
+        for file in sorted(os.listdir(self.new_directory), key=self.numericalSort):    
+            new_path = self.new_directory + "/" + str(file)
+            new_files.append(new_path)
+        if len(old_files) != len(new_files):
+            raise ValueError("The number of files in the old and new directories must be the same")
+        else:
+            for i in range(0,  len(old_files)):    
+                if output_name is not None:
+                    output_path = self.output_directory + "/" + output_name + "_" + str(i) + ".dcm"
+                else:
+                    output_path = self.output_directory + "/" + str(i) + ".dcm"
+                new_file = pydicom.dcmread(new_files[i])
+                new_array = new_file.pixel_array
+                writer = SingleFileWriter(old_files[i])
+                writer.write(new_array, output_path)
