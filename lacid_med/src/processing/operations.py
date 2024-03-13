@@ -80,6 +80,7 @@ class Operations:
                 pixel_array_diff = self.image_difference(pixel_array_1, pixel_array_2, clipping)
             return pixel_array_diff
         
+      
         
 
 

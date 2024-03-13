@@ -14,6 +14,7 @@ class HistogramGenerator:
         plot_title: str = "",
         xlabel: str = "",
         ylabel: str = "",
+        step: int = 10,
     ):
         """
         Generates a 2D histogram from the provided 2D array and returns the bins and frequencies.
@@ -41,6 +42,7 @@ class HistogramGenerator:
         if show:
             try:
                 plt.plot(bins, hist)
+                plt.xticks(np.arange(0, arr_max+step,step))
                 plt.xlabel(xlabel)
                 plt.ylabel(ylabel)
                 plt.title(plot_title)
@@ -58,6 +60,8 @@ class HistogramGenerator:
         plot_title: str = "",
         xlabel: str = "",
         ylabel: str = "",
+        step: int = 10,
+        
     ):
         """
         Generates a 3D histogram from the provided 3D array and returns the bins and frequencies.
@@ -91,6 +95,7 @@ class HistogramGenerator:
         if show:
             try:
                 plt.plot(bins, average_hist)
+                plt.xticks(np.arange(0, arr_max+step,step))
                 plt.xlabel(xlabel)
                 plt.ylabel(ylabel)
                 plt.title(plot_title)
@@ -100,3 +105,5 @@ class HistogramGenerator:
                 print("Error plotting histogram:", str(e))
 
         return average_hist, bins
+
+        
