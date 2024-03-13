@@ -9,11 +9,11 @@ class Filters:
     def __init__(
         self,
         sequence_directory: str = None,
-        output_dir: str = None,
+        #output_dir: str = None,
     ):
 
         self.sequence_directory = sequence_directory
-        self.output_dir = output_dir
+        #self.output_dir = output_dir
 
         self.resampler = sitk.ResampleImageFilter()
         
@@ -74,8 +74,7 @@ class Filters:
         image = sitk.ImageSeriesReader()
         image.SetFileNames(image.GetGDCMSeriesFileNames(self.sequence_directory))
         image = image.Execute()
-        
-        image = sitk.Cast(self.image, sitk.sitkFloat32)
+        image = sitk.Cast(image, sitk.sitkFloat32)
         image = self.resample_image(image)
         image = (
             sitk.GetImageFromArray(image)
