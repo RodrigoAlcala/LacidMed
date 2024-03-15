@@ -19,7 +19,6 @@ class Operations:
         Raises:
             TypeError: If volumetric_array_1 or volumetric_array_2 is not a numpy array.
         """
-         
         if not isinstance(volumetric_array_1, np.ndarray) and volumetric_array_1 is not None:
             raise TypeError("volumetric_array_1 must be a numpy array")
         
@@ -80,7 +79,6 @@ class Operations:
                 pixel_array_diff = self.image_difference(pixel_array_1, pixel_array_2, clipping)
             return pixel_array_diff
         
-      
         
 
 
