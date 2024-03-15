@@ -164,5 +164,4 @@ cython_debug/
 
 data/
 test/test_data/
-test_santi/
-test_santi/deanonymizer.py
+

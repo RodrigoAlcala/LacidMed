@@ -153,8 +153,6 @@ class Deanonymizer:
         """
         old_files = []
         for file in sorted(os.listdir(self.old_directory), key=self.numericalSort):    
-            old_path = self.old_directory + "/" + str(file)
-            old_files.append(old_path)
             old_path = os.path.join(self.old_directory, file)
             if file.endswith(".dcm"):                
                 old_files.append(old_path)
@@ -172,9 +170,9 @@ class Deanonymizer:
         else:
             for i in range(0,  len(old_files)):    
                 if output_name is not None:
-                    output_path = self.output_directory + "/" + output_name + "_" + str(i) + ".dcm"
+                    output_path = self.output_directory + "/" + output_name + "_" + str(i + 1) + ".dcm"
                 else:
-                    output_path = self.output_directory + "/" + str(i) + ".dcm"
+                    output_path = self.output_directory + "/" + str(i + 1) + ".dcm"
                 new_file = pydicom.dcmread(new_files[i])
                 new_array = new_file.pixel_array
                 writer = SingleFileWriter(old_files[i])
