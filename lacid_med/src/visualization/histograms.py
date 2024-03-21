@@ -106,4 +106,29 @@ class HistogramGenerator:
 
         return average_hist, bins
 
-        
+
+    def clip_histogram(self, lower_threshold: None, upper_threshold: int = None):
+        """
+        Generate a clipped histogram of the volumetric array in the provided range.
+        Args:
+            lower_threshold (int, optional): The lower threshold to apply to the histogram. Defaults to the minimum value in the array.
+            upper_threshold (int, optional): The upper threshold to apply to the histogram. Defaults to the maximum value in the array.
+
+        Returns:
+            tuple: bins and frequencies of the histogram
+        """
+        if lower_threshold == None: 
+            lower_threshold = 0 
+            print("Check lower threshold")
+        if upper_threshold >= np.max(self.array_3D):
+            raise ValueError("Upper threshold must be less than the maximum value in the array.")
+        if upper_threshold == None: 
+            upper_threshold = np.max(self.array_3D)
+            print("Check upper threshold")
+        if lower_threshold < np.min(self.array_3D):
+            raise ValueError("Lower threshold must be greater than the minimum value in the array.")
+        if upper_threshold < lower_threshold:
+            raise ValueError("Upper threshold must be greater than the lower threshold.")
+        clipped_array = np.clip(self.array_3D, lower_threshold, upper_threshold)
+        hist, bins = self.create_histogram_of_3d_array(clipped_array)
+        return hist, bins

@@ -11,7 +11,6 @@ from lacid_med.src.visualization.plotter import DicomPlotter
 from lacid_med.src.handler.loader import DicomLoaderMRI
 from lacid_med.src.handler.writer import MultipleFileWriter
 
-
 # np.set_printoptions(threshold=sys.maxsize)
 
 def main():
@@ -27,7 +26,7 @@ def main():
     
     operations_1 = Operations(image_1_array, image_2_array)
     
-    diff = operations_1.image_difference(image_2_array, image_1_array, clipping=False)
+    diff = operations_1.image_difference(image_2_array, image_1_array, clipping=True)
 
     plotter_1 = DicomPlotter(paths)
     plotter_1._show_image(image_1_array)
@@ -48,7 +47,7 @@ def main():
 
     operations_2 = Operations(vol_array_2, vol_array_1)
     
-    volume_diff = operations_2.volume_difference(image_number=89, clipping=False)
+    volume_diff = operations_2.volume_difference(image_number=89, clipping=True)
     
     plotter_2._show_image(volume_diff)
     
