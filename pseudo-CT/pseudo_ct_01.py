@@ -126,6 +126,7 @@ def main():
     #Fiteo second gaussian
     n=9
     poly_fit_2= n_polynomial_fit(bins[10:36], hist_filt[10:36],n)
+    print('poly_fit_2=',poly_fit_2)
 
     #Fiteo third gaussian
     gaussian_fit_3= fit_gaussian_to_histogram(hist=hist_filt[36:65], bins=bins[36:65], initial_guess=[50, 25, 0.25])
