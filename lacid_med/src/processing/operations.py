@@ -105,9 +105,4 @@ class Operations:
             image_array = self.volumetric_array_1
         clipped_array = np.clip(image_array, lower_threshold, upper_threshold)
         return clipped_array
-
-
-
-            
-
-        
+    
