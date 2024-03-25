@@ -101,6 +101,7 @@ def main():
     plt.plot(bins[36:65], obj_gaussian.gaussian(bins[36:65], *gaussian_fit_3),"x", label='Second Gaussian Fit', color='green',)
     plt.plot(bins[90:], obj_gaussian.gaussian(bins[90:], *gaussian_fit_4),"x", label='Third Gaussian Fit', color='orange')
     
+    
     plt.xlabel('Pixel Intensity')
     plt.ylabel('Frequency')
     plt.title ('ZTE Fit to Histogram')

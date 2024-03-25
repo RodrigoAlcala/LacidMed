@@ -20,6 +20,7 @@ class Fitting:
         self.x = x
         self.y = y
 
+
     def gaussian(self, x, mean, amplitude, standard_deviation):
         """
         Gaussian function.
