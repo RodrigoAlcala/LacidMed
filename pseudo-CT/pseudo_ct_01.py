@@ -43,13 +43,11 @@ def main():
             
     norm_vol_raw = np.dstack(norm_slices_raw) #dstack apila los arrays
     
-
     norm_slices = []
     for i in range(np.shape(vol_filt)[2]): #se itera en la tercer dimension de la matriz vol_filt
         arr = vol_filt[:,:,i] #la variable i recorre todos los cortes
         normalized_arr = filter.normalize_image_filter(image_arr=arr)
         norm_slices.append(normalized_arr) #lista de arrays normalizados
-
 
     norm_vol_filt = np.dstack(norm_slices) #dstack apila los arrays
 
@@ -63,8 +61,6 @@ def main():
     histogram3D = HistogramGenerator(array_3D=norm_vol_filt)
     hist_filt, bins = histogram3D.create_histogram_of_3d_array(offset=OFFSET, show=True, plot_title="Histogram of filtered image", xlabel="Pixel value", ylabel="Frequency")
     
-
-
     #Histogram peak (normalized)
     index_filt= np.argmax(hist_filt)
     max_value_filt= np.max(hist_filt)
@@ -101,13 +97,14 @@ def main():
     plt.plot(bins[36:65], obj_gaussian.gaussian(bins[36:65], *gaussian_fit_3),"x", label='Second Gaussian Fit', color='green',)
     plt.plot(bins[90:], obj_gaussian.gaussian(bins[90:], *gaussian_fit_4),"x", label='Third Gaussian Fit', color='orange')
     
-    
     plt.xlabel('Pixel Intensity')
     plt.ylabel('Frequency')
     plt.title ('ZTE Fit to Histogram')
     plt.grid(True)
     plt.legend()
     plt.show()
+    
 
 if __name__ == "__main__":
     main()
+
