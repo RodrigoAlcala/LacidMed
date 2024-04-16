@@ -60,8 +60,7 @@ class HistogramGenerator:
         plot_title: str = "",
         xlabel: str = "",
         ylabel: str = "",
-        x_step: int = 10,
-        y_step: int = 100,
+        step: int = 10,
         
     ):
         """
@@ -96,10 +95,9 @@ class HistogramGenerator:
         if show:
             try:
                 plt.plot(bins, average_hist)
-                plt.xticks(np.arange(0, arr_max+x_step,x_step))
+                plt.xticks(np.arange(0, arr_max+step,step))
                 plt.xlabel(xlabel)
                 plt.ylabel(ylabel)
-                plt.yticks(np.arange(0, np.max(average_hist)+y_step,y_step))
                 plt.title(plot_title)
                 plt.grid()
                 plt.show()
