@@ -25,21 +25,24 @@ def main():
     paths = [path1, path2]
     
     operations_1 = Operations(image_1_array, image_2_array)
-    
     diff = operations_1.image_difference(image_2_array, image_1_array, clipping=True)
+    negative_image_1 = operations_1.negative_transform()
 
+    
     plotter_1 = DicomPlotter(paths)
     plotter_1._show_image(image_1_array)
     plotter_1._show_image(image_2_array)
     plotter_1._show_image(diff)
+    plotter_1._show_image(negative_image_1) 
 
-        
+    
+    
     # test using two directories.
     directory_1 = "C:/Users/santi/Desktop/Fuesmen/imagenes/ZTE_H01_descomp"
     loader_1 = DicomLoaderMRI(directory_1)
     vol_array_1 = loader_1.generate_volumetric_array()
 
-    directory_2 = "C:/Users/santi/Desktop/Fuesmen/imagenes/N4_volume"
+    directory_2 = "C:/Users/santi/Desktop/Fuesmen/imagenes/test_volume"
     loader_2 = DicomLoaderMRI(directory_2)
     vol_array_2 = loader_2.generate_volumetric_array()
     
