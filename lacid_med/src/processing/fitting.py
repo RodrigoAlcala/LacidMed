@@ -34,7 +34,7 @@ class Fitting:
         Returns:
         float or numpy.ndarray: Value(s) of the Gaussian function evaluated at input x.
         """
-        return amplitude * np.exp(-((x - mean) / standard_deviation) ** 2 / 2)
+        return amplitude * np.exp(-((x - mean) / standard_deviation) ** 2 / 2) 
 
     def fit_gaussian_to_histogram(self, initial_guess= [0, 0, 0]):
         """
@@ -57,4 +57,9 @@ class Fitting:
     def n_polynomial_fit(self, n):
         coefs = np.polyfit(self.x, self.y, n)
         pol_func = np.polyval(coefs,self.x)
+        for indice, coef in enumerate (coefs):
+            coef_round = round(coef, 10)
+            print(f'coefients{indice}: {coef_round}')
+    
         return pol_func
+    
