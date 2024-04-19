@@ -273,3 +273,4 @@ class Filters:
     def inverse_fourier_trasform_filter(self, kspace_arr: np.ndarray):
         magnitude_space = np.abs(np.fft.ifft2(kspace_arr))
         return self.normalize_image_filter(magnitude_space)
+    

@@ -134,3 +134,4 @@ class HistogramGenerator:
         clipped_array = np.clip(self.array_3D, lower_threshold, upper_threshold)
         hist, bins = self.create_histogram_of_3d_array(clipped_array)
         return hist, bins
+    

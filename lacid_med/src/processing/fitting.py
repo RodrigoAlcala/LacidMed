@@ -63,3 +63,4 @@ class Fitting:
     
         return pol_func
     
+    
