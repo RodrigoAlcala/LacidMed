@@ -88,6 +88,8 @@ class Operations:
             image_array (np.array, optional): The image or volume array to segment. Defaults to volumetric_array_1.
             lower_threshold (int, optional): The lower threshold for the segmentation. Defaults to the minimum value in the array.
             upper_threshold (int, optional): The upper threshold for the segmentation. Defaults to the maximum value in the array.
+        Returns: 
+            np.array: The segmented image or volume array.
         """
         if lower_threshold == None: 
             lower_threshold = 0 
@@ -105,4 +107,3 @@ class Operations:
             image_array = self.volumetric_array_1
         clipped_array = np.clip(image_array, lower_threshold, upper_threshold)
         return clipped_array
-
