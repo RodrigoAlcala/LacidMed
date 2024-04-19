@@ -58,7 +58,7 @@ class Filters:
         self,
         mask_image=None,
         convergence_threshold: float = 0.001,
-        max_iterations: List[int] = [3, 3, 3],
+        max_iterations: List[int] = [50, 50, 50],
     ) -> sitk.Image:
         """
         Apply N4 bias correction to the input image.

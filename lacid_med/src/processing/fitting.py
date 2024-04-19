@@ -57,4 +57,9 @@ class Fitting:
     def n_polynomial_fit(self, n):
         coefs = np.polyfit(self.x, self.y, n)
         pol_func = np.polyval(coefs,self.x)
+        for indice, coef in enumerate (coefs):
+            coef_round = round(coef, 10)
+            print(f'coefients{indice}: {coef_round}')
+    
         return pol_func
+    
