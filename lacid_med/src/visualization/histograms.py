@@ -60,7 +60,8 @@ class HistogramGenerator:
         plot_title: str = "",
         xlabel: str = "",
         ylabel: str = "",
-        step: int = 10,
+        x_step: int = 10,
+        y_step: int = 100,
         
     ):
         """
@@ -95,9 +96,10 @@ class HistogramGenerator:
         if show:
             try:
                 plt.plot(bins, average_hist)
-                plt.xticks(np.arange(0, arr_max+step,step))
+                plt.xticks(np.arange(0, arr_max+x_step,x_step))
                 plt.xlabel(xlabel)
                 plt.ylabel(ylabel)
+                plt.yticks(np.arange(0, np.max(average_hist)+y_step,y_step))
                 plt.title(plot_title)
                 plt.grid()
                 plt.show()
@@ -132,3 +134,4 @@ class HistogramGenerator:
         clipped_array = np.clip(self.array_3D, lower_threshold, upper_threshold)
         hist, bins = self.create_histogram_of_3d_array(clipped_array)
         return hist, bins
+    
