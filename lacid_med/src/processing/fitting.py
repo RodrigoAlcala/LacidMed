@@ -63,4 +63,25 @@ class Fitting:
     
         return pol_func
     
-    
+    def suma_gaussianas(x:np.ndarray, gaussianas:list, elevation:int=0):
+        """
+        Suma de tres funciones gaussianas.
+        
+        Parameters:
+            x (numpy.ndarray): Valores de entrada.
+            gaussianas (list): Lista de listas que contiene los parámetros de las tres funciones gaussianas.
+                            Cada sub-lista tiene tres elementos: media, amplitud y desviación estándar.
+        
+        Returns:
+            numpy.ndarray: Suma de las tres funciones gaussianas evaluadas en los valores de entrada x.
+        """
+        # Inicializar la suma
+        suma_gauss = np.zeros_like(x)
+        
+        # Iterar sobre las funciones gaussianas
+        for parametros in gaussianas:
+            media, amplitud, desviacion= parametros
+            suma_gauss += amplitud * np.exp(-((x - media) / desviacion) ** 2 / 2)
+        suma_gauss += elevation
+        
+        return suma_gauss
