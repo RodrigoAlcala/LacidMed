@@ -91,20 +91,20 @@ class Operations:
         Returns: 
             np.array: The segmented image or volume array.
         """
+        if image_array == None:
+            image_array = self.volumetric_array_1
         if lower_threshold == None: 
             lower_threshold = 0 
             print("Check lower threshold")
-        if upper_threshold >= np.max(self.array_3D):
+        if upper_threshold >= np.max(image_array):
             raise ValueError("Upper threshold must be less than the maximum value in the array.")
         if upper_threshold == None: 
-            upper_threshold = np.max(self.array_3D)
+            upper_threshold = np.max(image_array)
             print("Check upper threshold")
-        if lower_threshold < np.min(self.array_3D):
+        if lower_threshold < np.min(image_array):
             raise ValueError("Lower threshold must be greater than the minimum value in the array.")
         if upper_threshold < lower_threshold:
             raise ValueError("Upper threshold must be greater than the lower threshold.")
-        if image_array == None:
-            image_array = self.volumetric_array_1
         clipped_array = np.clip(image_array, lower_threshold, upper_threshold)
         return clipped_array
 
@@ -145,3 +145,5 @@ class Operations:
         hounsfield_array = MRI_array.copy()
         hounsfield_array = np.add(np.multiply(((C_u - C_h) / (E_u - E_h)), np.subtract(hounsfield_array, E_h)), C_h)
         return hounsfield_array
+    
+    
