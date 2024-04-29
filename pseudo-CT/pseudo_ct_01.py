@@ -13,6 +13,7 @@ from lacid_med.src.processing.filters import Filters
 from lacid_med.src.visualization.plotter import DicomPlotter
 from lacid_med.src.visualization.histograms import HistogramGenerator
 from lacid_med.src.processing.fitting import Fitting
+from lacid_med.src.processing.operations import Operations
 
 def main():
     OFFSET=3
@@ -94,7 +95,10 @@ def main():
     plt.grid()
     plt.show()
     
-    #
+    #Threshold segmentation
+    segmentator= Operations(volumetric_array_1 = norm_vol_filt)
+    seg_vol= segmentator.threshold_segmentation(lower_threshold=60, upper_threshold=100)
+    sitk.WriteImage(sitk.GetImageFromArray(seg_vol),"/home/clara/PseudoCT/Codigos/LacidMed/pseudo-CT/output/seg_vol.nrrd")
 
 if __name__ == "__main__":
     main()
