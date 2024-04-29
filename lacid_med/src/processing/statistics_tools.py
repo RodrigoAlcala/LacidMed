@@ -36,3 +36,4 @@ class StatisticsTools:
         """
         return stats.spearmanr(img_array_1.flatten(), img_array_2.flatten())
     
+        
