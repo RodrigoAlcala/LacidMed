@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+
 
 import pydicom
 import matplotlib.pyplot as plt
@@ -82,7 +82,7 @@ epochs = 50
 batch_size = 128
 steps_per_epoch = len(train_images) // batch_size
 
-for epoch in range(epochs):
+for epoch in range(epochs): 
     for step in range(steps_per_epoch):
         noise = tf.random.normal([batch_size, 100])
         generated_images = generator.predict(noise)
