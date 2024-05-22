@@ -96,9 +96,17 @@ def main():
     plt.show()
     
     #Threshold segmentation
-    segmentator= Operations(volumetric_array_1 = norm_vol_filt)
-    seg_vol= segmentator.threshold_segmentation(lower_threshold=60, upper_threshold=100)
+    segmentator= Operations(volumetric_array_1 = vol_filt)
+    seg_vol= segmentator.threshold_segmentation(lower_threshold=100, upper_threshold=125)
     sitk.WriteImage(sitk.GetImageFromArray(seg_vol),"/home/clara/PseudoCT/Codigos/LacidMed/pseudo-CT/output/seg_vol.nrrd")
 
+    #Realzado de bordes
+    folder_n4_filtered="/home/clara/PseudoCT/Codigos/LacidMed/pseudo-CT/output/n4_corrected.nrrd"
+    filter_border = Filters(sequence_directory=folder_n4_filtered)
+    sitk_image=sitk.ReadImage(folder_n4_filtered)
+    image_array=sitk.GetArrayFromImage(sitk_image)
+    vol_sobel= filter_border.sobel_image_filter(img_arr=image_array)
+    sitk.WriteImage(sitk.GetImageFromArray(vol_sobel),"/home/clara/PseudoCT/Codigos/LacidMed/pseudo-CT/output/sobel.nrrd")
+    
 if __name__ == "__main__":
     main()
