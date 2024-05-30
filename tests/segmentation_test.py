@@ -63,6 +63,8 @@ axs[1].set_title('Segmentation Result')
 axs[1].axis('off')
 plt.show()
 
+
+"""
 conversor = Converter(input_directory="C:/Users/santi/Desktop/Fuesmen/imagenes/test_volume", output_directory="C:/Users/santi/Desktop/Fuesmen/imagenes/output_converter")
 conversor.dicom_directory_2_jpg(output_name_custom="test_images")
 conversor_2 = Converter(input_file= "C:/Users/santi/Desktop/Fuesmen/imagenes/output_converter/test_images_77.JPEG", output_directory="C:/Users/santi/Desktop/Fuesmen/imagenes/output_converter_2")
@@ -71,3 +73,4 @@ conversor_3 = Converter(input_directory="C:/Users/santi/Desktop/Fuesmen/imagenes
 conversor_3.jpeg_directory_2_nrrd()
 conversor_4 = Converter(input_directory="C:/Users/santi/Desktop/Fuesmen/imagenes/upscayl_jpg_ultramix_balanced_5x", output_directory="C:/Users/santi/Desktop/Fuesmen/imagenes/output_converter_4")
 conversor_4.jpeg_directory_2_nrrd()
+"""

@@ -19,6 +19,10 @@ def scale_matrix_to_255(matrix):
     # Step 1: Normalize the matrix to the range 0 to 1
     min_val = np.min(matrix)
     max_val = np.max(matrix)
+
+    if min_val > 0:
+        min_val = 0
+
     normalized_matrix = (matrix - min_val) / (max_val - min_val)
     
     # Step 2: Scale the normalized matrix to the range 0 to 255
@@ -50,8 +54,24 @@ def main():
     vol_filt_stack = np.dstack(vol_filt) #dstack apila los arrays
     sitk.WriteImage(sitk.GetImageFromArray(vol_filt_stack),"/home/clara/PseudoCT/Codigos/LacidMed/pseudo-CT/output/no_norm_filt.nrrd")
 
-    norm_vol_raw = scale_matrix_to_255(org_vol)
-    norm_vol_filt = scale_matrix_to_255(norm_vol_filt)
+    #Normalizar
+    norm_slices_raw = []
+    for i in range(np.shape(org_vol)[2]): #se itera en la tercer dimension de la matriz vol_filt
+        arr = org_vol[:,:,i] #la variable i recorre todos los cortes
+        normalized_arr_raw = filter.normalize_image_filter(image_arr=arr)
+        norm_slices_raw.append(normalized_arr_raw) #lista de arrays normalizados
+            
+    norm_vol_raw = np.dstack(norm_slices_raw) #dstack apila los arrays
+    
+    norm_slices = []
+    for i in range(np.shape(vol_filt)[2]): #se itera en la tercer dimension de la matriz vol_filt
+        arr = vol_filt[:,:,i] #la variable i recorre todos los cortes
+        normalized_arr = filter.normalize_image_filter(image_arr=arr)
+        norm_slices.append(normalized_arr) #lista de arrays normalizados
+
+    norm_vol_filt = np.dstack(norm_slices) #dstack apila los arrays
+
+    
 
     sitk.WriteImage(sitk.GetImageFromArray(norm_vol_filt),"/home/clara/PseudoCT/Codigos/LacidMed/pseudo-CT/output/filtrada_norm.nrrd")
 
