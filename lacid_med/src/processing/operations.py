@@ -146,4 +146,25 @@ class Operations:
         hounsfield_array = np.add(np.multiply(((C_u - C_h) / (E_u - E_h)), np.subtract(hounsfield_array, E_h)), C_h)
         return hounsfield_array
     
-    
+    def scale_matrix_to_value(self, value: int = 255):
+        """
+        Scale a matrix to a specific value.
+        Args:
+            value (int, optional): The value to scale the matrix to. Defaults to 255.
+        Returns:
+            np.array: The scaled matrix.
+        """
+        # Step 1: Normalize the matrix to the range 0 to 1
+        min_val = np.min(self.volumetric_array_1)
+        max_val = np.max(self.volumetric_array_1)
+        if min_val > 0:
+            min_val = 0
+        normalized_matrix = (self.volumetric_array_1.copy() - min_val) / (max_val - min_val)
+        # Step 2: Scale the normalized matrix to the range 0 to 255
+        scaled_matrix = normalized_matrix * 255
+        # Step 3: Convert the scaled matrix to uint8
+        scaled_matrix_uint8 = scaled_matrix.astype(np.uint8)
+        rounded_matrix_uint8 = np.round(scaled_matrix_uint8)
+        return rounded_matrix_uint8
+        
+        

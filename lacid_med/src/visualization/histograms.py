@@ -14,7 +14,8 @@ class HistogramGenerator:
         plot_title: str = "",
         xlabel: str = "",
         ylabel: str = "",
-        step: int = 10,
+        x_step: int = None,
+        y_step: int = None,
     ):
         """
         Generates a 2D histogram from the provided 2D array and returns the bins and frequencies.
@@ -42,7 +43,10 @@ class HistogramGenerator:
         if show:
             try:
                 plt.plot(bins, hist)
-                plt.xticks(np.arange(0, arr_max+step,step))
+                if x_step is not None:
+                    plt.xticks(np.arange(0, arr_max+x_step,x_step))            
+                if y_step is not None:
+                    plt.yticks(np.arange(0, np.max(hist)+y_step,y_step))
                 plt.xlabel(xlabel)
                 plt.ylabel(ylabel)
                 plt.title(plot_title)
@@ -60,8 +64,8 @@ class HistogramGenerator:
         plot_title: str = "",
         xlabel: str = "",
         ylabel: str = "",
-        x_step: int = 10,
-        y_step: int = 100,
+        x_step: int = None,
+        y_step: int = None,
         
     ):
         """
@@ -77,36 +81,85 @@ class HistogramGenerator:
         if self.array_3D is None:
             return None, None
 
-        histograms = []
         arr_max = int(np.max(self.array_3D))
-        for i in range(self.array_3D.shape[2]):
-            arr = self.array_3D[:, :, i]
-            hist, bins = np.histogram(arr.flatten(), bins=arr_max, density=False)
+        hist, bins = np.histogram(self.array_3D.flatten(), bins=arr_max, density=False)
 
-            if offset < len(bins):
-                bins = bins[offset + 1 :]
-                hist = hist[offset:]
-            else:
-                bins = []
-                hist = []
-
-            histograms.append(hist)
-        average_hist = np.mean(histograms, axis=0)
+        if offset < len(bins):
+            bins = bins[offset + 1 :]
+            hist = hist[offset:]
+        else:
+            bins = []
+            hist = []
 
         if show:
             try:
-                plt.plot(bins, average_hist)
-                plt.xticks(np.arange(0, arr_max+x_step,x_step))
+                plt.plot(bins, hist)
+                if x_step is not None:
+                    plt.xticks(np.arange(0, arr_max+x_step,x_step))            
+                if y_step is not None:
+                    plt.yticks(np.arange(0, np.max(hist)+y_step,y_step))
                 plt.xlabel(xlabel)
                 plt.ylabel(ylabel)
-                plt.yticks(np.arange(0, np.max(average_hist)+y_step,y_step))
                 plt.title(plot_title)
                 plt.grid()
                 plt.show()
             except Exception as e:
                 print("Error plotting histogram:", str(e))
 
-        return average_hist, bins
+        return hist, bins 
+    
+    def create_mean_histogram_of_3d_array(
+        self,
+        offset: int = 0,
+        show: bool = True,
+        plot_title: str = "",
+        xlabel: str = "",
+        ylabel: str = "",
+        x_step: int = None,
+        y_step: int = None,
+        
+    ):
+        """
+        Generates a 3D histogram from the provided 3D array and returns the bins and frequencies.
+
+        Args:
+            offset (int, optional): The offset to apply to the histogram bins and frequencies. Defaults to 0.
+            show (bool, optional): Whether to display the histogram using matplotlib. Defaults to True.
+
+        Returns:
+            tuple: bins and frequencies of the histogram
+        """
+        if self.array_3D is None:
+            return None, None
+
+        arr_max = int(np.max(self.array_3D))
+        hist, bins = np.histogram(self.array_3D.flatten(), bins=arr_max, density=False)
+        hist_mean = hist / self.array_3D.shape[2]
+
+        if offset < len(bins):
+            bins = bins[offset + 1 :]
+            hist_mean = hist_mean[offset:]
+        else:
+            bins = []
+            hist_mean = []
+
+        if show:
+            try:
+                plt.plot(bins, hist_mean)
+                if x_step is not None:
+                    plt.xticks(np.arange(0, arr_max+x_step,x_step))            
+                if y_step is not None:
+                    plt.yticks(np.arange(0, np.max(hist_mean)+y_step,y_step))
+                plt.xlabel(xlabel)
+                plt.ylabel(ylabel)
+                plt.title(plot_title)
+                plt.grid()
+                plt.show()
+            except Exception as e:
+                print("Error plotting histogram:", str(e))
+
+        return hist_mean, bins 
+
 
 
     def clip_histogram(self, lower_threshold: None, upper_threshold: int = None):

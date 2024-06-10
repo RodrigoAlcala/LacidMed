@@ -167,3 +167,4 @@ data/
 test/test_data/
 pseudo-CT/output
 test/CNN_test.py
+santi_test/

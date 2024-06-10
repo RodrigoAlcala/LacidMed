@@ -9,8 +9,12 @@ from PIL import Image
 # lacid_med directory append.
 import sys
 sys.path.append("C:/Users/santi/Desktop/Fuesmen/code/LacidMed")
-
-from lacid_med.src.handler.converter import Converter
+from lacid_med.src.handler.loader import DicomLoaderMRI
+from lacid_med.src.processing.filters import Filters
+from lacid_med.src.visualization.plotter import DicomPlotter
+from lacid_med.src.visualization.histograms import HistogramGenerator
+from lacid_med.src.processing.fitting import Fitting
+from lacid_med.src.processing.operations import Operations
 
 def region_growing(image, seed_point, lower_threshold, upper_threshold):
     # Convert seed point to SimpleITK index
@@ -24,38 +28,49 @@ def region_growing(image, seed_point, lower_threshold, upper_threshold):
     # Perform region growing segmentation
     seg_result = sitk.ConfidenceConnected(image, seedList=[seed_index],
                                           numberOfIterations=100,
-                                          multiplier=4,
+                                          multiplier=3,
                                           initialNeighborhoodRadius=1,
                                           replaceValue=1)
     
     return seg_result
 
+
+
 # Load example image from skimage.data
 camera_image = data.camera()
 
-dicom_path = "C:/Users/santi/Desktop/Fuesmen/imagenes/test_volume/test_name_40.dcm"
+dicom_path = "C:/Users/santi/Desktop/Fuesmen/imagenes/test_volume/test_name_80.dcm"
 
 dicom_image = pydicom.dcmread(dicom_path)
 dicom_array = dicom_image.pixel_array
 image = sitk.GetImageFromArray(dicom_array)
 
 
+#Realzado de bordes
+folder_n4_filtered= "C:/Users/santi/Desktop/Fuesmen/imagenes/sobel.nrrd"
+
+sitk_image = sitk.ReadImage(folder_n4_filtered)
+image_array = sitk.GetArrayFromImage(sitk_image)
+image_2 = sitk.GetImageFromArray()
+
+
 # Define seed point (you can choose this interactively or programmatically)
-seed_point = [50, 50]  # Example seed point coordinates in physical space
+seed_point = [120, 120]  # Example seed point coordinates in physical space
 
 # Define lower and upper intensity thresholds
 lower_threshold = 100
 upper_threshold = 150
 
 # Perform region growing segmentation
-segmentation_result = region_growing(image, seed_point, lower_threshold, upper_threshold)
+# segmentation_result = region_growing(image, seed_point, lower_threshold, upper_threshold)
+segmentation_result = region_growing(image_2, seed_point, lower_threshold, upper_threshold)
 
 # Convert segmentation result to NumPy array for visualization
 segmentation_array = sitk.GetArrayFromImage(segmentation_result)
 
 # Plot the original image and the segmentation result
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-axs[0].imshow(dicom_array, cmap='gray')
+axs[0].imshow(vol_sobel[:, :, 85], cmap='gray')
 axs[0].set_title('Original Image')
 axs[0].axis('off')
 axs[1].imshow(segmentation_array, cmap='gray')
