@@ -80,35 +80,6 @@ class Operations:
             return pixel_array_diff
         
 
-    def threshold_segmentation(self, image_array: np.array = None, lower_threshold: int = None, upper_threshold: int = None):
-        """
-        Generate a segmentation of the array based on a threshold. 
-        If no volumetric array is given, volumetric_array_1 is used.
-        Args:
-            image_array (np.array, optional): The image or volume array to segment. Defaults to volumetric_array_1.
-            lower_threshold (int, optional): The lower threshold for the segmentation. Defaults to the minimum value in the array.
-            upper_threshold (int, optional): The upper threshold for the segmentation. Defaults to the maximum value in the array.
-        Returns: 
-            np.array: The segmented image or volume array.
-        """
-        if image_array == None:
-            image_array = self.volumetric_array_1
-        if lower_threshold == None: 
-            lower_threshold = 0 
-            print("Check lower threshold")
-        if upper_threshold >= np.max(image_array):
-            raise ValueError("Upper threshold must be less than the maximum value in the array.")
-        if upper_threshold == None: 
-            upper_threshold = np.max(image_array)
-            print("Check upper threshold")
-        if lower_threshold < np.min(image_array):
-            raise ValueError("Lower threshold must be greater than the minimum value in the array.")
-        if upper_threshold < lower_threshold:
-            raise ValueError("Upper threshold must be greater than the lower threshold.")
-        clipped_array = np.clip(image_array, lower_threshold, upper_threshold)
-        return clipped_array
-
-
     def negative_transform(self, pixel_array: np.array = None):
         """
         Generate a negative transformation of an image or volume. If no image is given, volumetric_array_1 is used.
@@ -146,7 +117,7 @@ class Operations:
         hounsfield_array = np.add(np.multiply(((C_u - C_h) / (E_u - E_h)), np.subtract(hounsfield_array, E_h)), C_h)
         return hounsfield_array
     
-    def scale_matrix_to_value(self, value: int = 255):
+    def scale_matrix_to_value(self):
         """
         Scale a matrix to a specific value.
         Args:

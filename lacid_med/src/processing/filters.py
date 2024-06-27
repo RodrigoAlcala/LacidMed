@@ -4,6 +4,7 @@ import pydicom
 from typing import List
 import SimpleITK as sitk
 import scipy.fft
+from scipy.ndimage import minimum_filter
 
 class Filters:
     def __init__(
@@ -274,3 +275,14 @@ class Filters:
         magnitude_space = np.abs(np.fft.ifft2(kspace_arr))
         return self.normalize_image_filter(magnitude_space)
     
+    def apply_minimum_filter(self, img_arr: np.ndarray, kernel_size: int = 3):
+        """
+        Applies a minimum filter to the input image.
+        Args:
+            img_arr (np.ndarray): The input image.
+            kernel_size (int) optional: The size of the kernel. Default is 3.
+        Returns:
+            np.ndarray: The filtered image.
+        """
+        filtered_image = minimum_filter(img_arr, size=kernel_size)
+        return filtered_image

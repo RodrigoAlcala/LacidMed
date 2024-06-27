@@ -50,34 +50,34 @@ class MultipleFileWriter:
         """
         self.dicom_files = dicom_files
 
-    def write(self, new_pixel_array: np.ndarray, output_path: str) -> None:
+    def write(self, volumetric_array: np.ndarray, output_path: str) -> None:
         """
         Writes a new pixel array to a DICOM file at the given output path for multiple files at the same time.
         Args:
             new_pixel_array (np.ndarray): The new pixel array to be written.
             output_path (str): The path of the DICOM file to be written.
         """
+        i = 0
         for dicom_file in self.dicom_files:
             try:
                 ds = pydicom.dcmread(dicom_file)
+                new_pixel_array = volumetric_array[:, :, i]
+                i += 1
                 if new_pixel_array.shape == (ds.Rows, ds.Columns):
                     ds.PixelData = new_pixel_array.tobytes()
                     ds.Rows, ds.Columns = new_pixel_array.shape
                     unique_output_path = (
-                        output_path + "_" + os.path.basename(dicom_file)
+                        output_path + "/" + os.path.basename(dicom_file)
                     )
-                    if os.path.exists(unique_output_path) and os.access(
-                        unique_output_path, os.W_OK
-                    ):
-                        ds.save_as(unique_output_path)
-                    else:
-                        raise ValueError("Invalid or unwritable output path")
+            
+                    ds.save_as(unique_output_path)
+                    
                 else:
                     raise ValueError("Shape of new_pixel_array does not match original pixel data")
             except Exception as e:
                 print(f"Error writing file {dicom_file}: {str(e)}")
 
-        def process_file(dicom_file):
+        def process_file(self, dicom_file):
             """
             Helper function to process a single DICOM file.
             Args:
