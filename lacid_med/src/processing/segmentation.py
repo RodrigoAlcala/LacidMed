@@ -2,7 +2,10 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import cv2
 import pydicom
+from scipy.ndimage import label
+
 
 class Segmentation:
     def __init__(self, 
@@ -74,7 +77,7 @@ class Segmentation:
         return clipped_array
     
     def region_growing(
-        Self, 
+        self, 
         seed_point: list = None, 
         number_of_iterations: int = None,
         multiplier: float = None,
@@ -100,18 +103,24 @@ class Segmentation:
             number_of_iterations = 10
             print("It is recomended to use a custom number of iterations. Default is 10.")                
         if seed_point is None:
-            if Self.image_array is not None:
+            if self.image_array is not None:
                 seed_point = [0, 0]
                 print("It is recomended to use a custom seed point. Default is (0, 0).")
             else:
                 seed_point = [0, 0, 0]
                 print("It is recomended to use a custom seed point. Default is (0, 0, 0).")
-        if Self.image_array is not None:
-            sitk_image = sitk.GetImageFromArray(Self.image_array)
+        elif len(seed_point) == 3:
+            # convert to [z, x, y], wich is the format of SimpleITK.
+            z = seed_point[2]
+            x = seed_point[0]
+            y = seed_point[1]
+            seed_point = [z, x, y]
+        if self.image_array is not None:
+            sitk_image = sitk.GetImageFromArray(self.image_array)
             if len(seed_point) != 2:
                 raise ValueError("Seed point must have 2 dimensions.")
         else:
-            sitk_image = sitk.GetImageFromArray(Self.volumetric_array)
+            sitk_image = sitk.GetImageFromArray(self.volumetric_array)
             if len(seed_point) != 3:
                 raise ValueError("Seed point must have 3 dimensions.")
         seed_index = sitk_image.TransformPhysicalPointToIndex(seed_point)
@@ -131,5 +140,59 @@ class Segmentation:
         seg_array = sitk.GetArrayFromImage(seg_result)
         return seg_array
 
+    def find_largest_component(self, volume: np.ndarray = None):
+        """
+        Finds and segments the largest interconnected mass in a 3D binary volume.
+        Args:
+            volume (np.ndarray): 3D binary volume. Optional if volumetric_array is provided (mostly used for the backround_remover_volumetric method). 
+            
+        Returns:
+            np.ndarray: A mask of the largest interconnected mass.
+        """
+        if volume is not None:
+            labeled_volume, num_features = label(volume)    
+        else:
+            labeled_volume, num_features = label(self.volumetric_array)
+        largest_component_label = 0
+        largest_component_size = 0
+        for label_num in range(1, num_features + 1):
+            component_size = np.sum(labeled_volume == label_num)
+            if component_size > largest_component_size:
+                largest_component_size = component_size
+                largest_component_label = label_num
+        largest_component_mask = (labeled_volume == largest_component_label)        
+        return largest_component_mask
 
     
+    def background_remover_volumetric(self, background_seed_point=[0,0,0], background_multiplier=5, background_number_of_iterations=100):
+        """
+        Subtracts the background from the image array.
+        Args:
+            image_array (np.ndarray): The image array to subtract the background from.
+            background_seed_point (list, optional): The seed point for the background segmentation. Defaults to [0, 0].
+            background_multiplier (float, optional): The multiplier for the background segmentation. Defaults to 5.
+            background_number_of_iterations (int, optional): The number of iterations for the background segmentation. Defaults to 100.
+        Returns:
+            np.ndarray: The image array with the background subtracted.
+        """
+        region_growing_mask = self.region_growing(seed_point=background_seed_point, multiplier=background_multiplier, number_of_iterations=background_number_of_iterations, invert_mask=True)
+        filtered_array = np.multiply(region_growing_mask, self.volumetric_array)
+        largest_component_mask = self.find_largest_component(filtered_array)
+        largest_component = np.multiply(largest_component_mask, self.volumetric_array)
+        return largest_component
+
+    def canny_volumetric(self, low_threshold, high_threshold):
+        edges_volume = np.zeros_like(self.volumetric_array)        
+        for i in range(self.volumetric_array.shape[2]):
+            edges_volume[i] = cv2.Canny(self.volumetric_array[i].astype(np.uint8), low_threshold, high_threshold)
+        return edges_volume
+
+
+
+
+
+
+
+
+
+
