@@ -90,7 +90,7 @@ directory_path = 'C:/Users/santi/Desktop/largest_component'
 loader_3 = DicomLoaderMRI(directory_path=directory_path) 
 vol_array_3 = loader_3.volumetric_array
 segmenter_3 = Segmentation(volumetric_array=vol_array_3)
-region_growing = segmenter_3.region_growing(seed_point=[220, 87, 70], multiplier=2, number_of_iterations=1, invert_mask=None)
+region_growing = segmenter_3.region_growing(seed_point=[218, 86, 70], multiplier=3, number_of_iterations=5, invert_mask=None)
 print("The volume shape is: ", vol_array_3.shape)
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))
 

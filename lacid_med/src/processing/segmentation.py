@@ -73,7 +73,9 @@ class Segmentation:
             raise ValueError("Lower threshold must be greater than the minimum value in the array.")
         if upper_threshold < lower_threshold:
             raise ValueError("Upper threshold must be greater than the lower threshold.")
-        clipped_array = np.clip(array_2_clip, lower_threshold, upper_threshold)
+        clipped_array = np.copy(array_2_clip)
+        clipped_array[clipped_array < lower_threshold] = 0
+        clipped_array[clipped_array > upper_threshold] = 0
         return clipped_array
     
     def region_growing(
