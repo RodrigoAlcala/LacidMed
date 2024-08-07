@@ -64,11 +64,11 @@ class Segmentation:
         if lower_threshold == None: 
             lower_threshold = 0 
             print("Check lower threshold")
-        if upper_threshold >= np.max(array_2_clip):
-            raise ValueError("Upper threshold must be less than the maximum value in the array.")
         if upper_threshold == None: 
             upper_threshold = np.max(array_2_clip)
             print("Check upper threshold")
+        if upper_threshold > np.max(array_2_clip):
+            raise ValueError("Upper threshold must be less than the maximum value in the array.")
         if lower_threshold < np.min(array_2_clip):
             raise ValueError("Lower threshold must be greater than the minimum value in the array.")
         if upper_threshold < lower_threshold:

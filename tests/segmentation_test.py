@@ -1,4 +1,3 @@
-
 import SimpleITK as sitk
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,7 +21,7 @@ from lacid_med.src.processing.fitting import Fitting
 from lacid_med.src.processing.operations import Operations
 from lacid_med.src.processing.segmentation import Segmentation
 
-# dicom_path = "C:/Users/santi/Desktop/Segmented/MR.1.2.840.113619.2.363.10499743.3637646.25026.1684513445.974.70.dcm"
+# dicom_path = "C:/Users/santi/Desktop/Fuesmen/imagenes/Segmented/MR.1.2.840.113619.2.363.10499743.3637646.25026.1684513445.974.70.dcm"
 # dicom_image = pydicom.dcmread(dicom_path)
 # dicom_array = dicom_image.pixel_array
 # filtrator_1 = Filters(sequence_directory=dicom_path)
@@ -59,7 +58,7 @@ from lacid_med.src.processing.segmentation import Segmentation
 # axs[3].axis('off')
 # plt.show()
 
-# directory_path_1 = "C:/Users/santi/Desktop/Fuesmen/imagenes/ZTE_H01_descomp"
+# directory_path_1 = "C:/Users/santi/Desktop/Fuesmen/imagenes/Fuesmen/imagenes/ZTE_H01_descomp"
 # loader_1 = DicomLoaderMRI(directory_path=directory_path_1) 
 # vol_array_1 = loader_1.volumetric_array 
 # segmenter_1 = Segmentation(volumetric_array=vol_array_1)
@@ -71,29 +70,32 @@ from lacid_med.src.processing.segmentation import Segmentation
 #             )
 # filtered_vol_1 = np.multiply(segmented_vol_1, vol_array_1)
 
-# sitk.WriteImage(sitk.GetImageFromArray(filtered_vol_1),"C:/Users/santi/Desktop/segmented_vol.nrrd")
+# sitk.WriteImage(sitk.GetImageFromArray(filtered_vol_1),"C:/Users/santi/Desktop/Fuesmen/imagenes/segmented_vol.nrrd")
 # writer = MultipleFileWriter(loader_1.sorted_files)
-# writer.write(filtered_vol_1, 'C:/Users/santi/Desktop/Segmented')
+# writer.write(filtered_vol_1, 'C:/Users/santi/Desktop/Fuesmen/imagenes/Segmented')
 
-# directory_path = 'C:/Users/santi/Desktop/Segmented'
+# directory_path = 'C:/Users/santi/Desktop/Fuesmen/imagenes/Segmented'
 # loader_2 = DicomLoaderMRI(directory_path=directory_path) 
 # vol_array_2 = loader_2.volumetric_array 
 # segmenter_2 = Segmentation(volumetric_array=vol_array_2)
 # largest_component = segmenter_2.background_remover_volumetric()
-# sitk.WriteImage(sitk.GetImageFromArray(largest_component),"C:/Users/santi/Desktop/largest_component.nrrd")
+# sitk.WriteImage(sitk.GetImageFromArray(largest_component),"C:/Users/santi/Desktop/Fuesmen/imagenes/largest_component.nrrd")
 # writer = MultipleFileWriter(loader_2.sorted_files)
-# writer.write(largest_component, 'C:/Users/santi/Desktop/largest_component')
+# writer.write(largest_component, 'C:/Users/santi/Desktop/Fuesmen/imagenes/largest_component')
 # segmenter_3 = Segmentation(volumetric_array=largest_component)
 # canny_volume = segmenter_3.canny_segmentation()
 
-directory_path = 'C:/Users/santi/Desktop/largest_component'
+directory_path = 'C:/Users/santi/Desktop/Fuesmen/imagenes/largest_component'
 loader_3 = DicomLoaderMRI(directory_path=directory_path) 
 vol_array_3 = loader_3.volumetric_array
 segmenter_3 = Segmentation(volumetric_array=vol_array_3)
-region_growing = segmenter_3.region_growing(seed_point=[218, 86, 70], multiplier=3, number_of_iterations=5, invert_mask=None)
+region_growing = segmenter_3.region_growing(seed_point=[218, 86, 70], multiplier=1.5, number_of_iterations=5, invert_mask=None)
+
+
+
+
 print("The volume shape is: ", vol_array_3.shape)
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-
 axs[0].imshow(vol_array_3[:, :, 80], cmap='gray')
 axs[0].set_title('Original Image')
 axs[0].axis('off')
@@ -105,7 +107,9 @@ axs[1].axis('off')
 plt.show()
 
 
-if not os.path.exists('C:/Users/santi/Desktop/region_growing'):
-    os.makedirs('C:/Users/santi/Desktop/region_growing', exist_ok=True)
+if not os.path.exists('C:/Users/santi/Desktop/Fuesmen/imagenes/region_growing'):
+    os.makedirs('C:/Users/santi/Desktop/Fuesmen/imagenes/region_growing', exist_ok=True)
 writer = MultipleFileWriter(loader_3.sorted_files)
-writer.write(region_growing, 'C:/Users/santi/Desktop/region_growing')
+writer.write(region_growing, 'C:/Users/santi/Desktop/Fuesmen/imagenes/region_growing')
+
+
