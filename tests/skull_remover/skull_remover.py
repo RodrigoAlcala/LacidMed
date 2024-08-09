@@ -65,3 +65,5 @@ plt.show()
 sitk.WriteImage(sitk.GetImageFromArray(sobel_tresholded),"C:/Users/santi/Desktop/Fuesmen/imagenes/skull_remover/sobel_tresholded/sobel_tresholded.nrrd")
 writer = MultipleFileWriter(loader_1.sorted_files)
 writer.write(sobel_tresholded, 'C:/Users/santi/Desktop/Fuesmen/imagenes/skull_remover/sobel_tresholded')
+
+
