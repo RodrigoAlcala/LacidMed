@@ -2,6 +2,7 @@ import SimpleITK as sitk
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import cv2
 from skimage import data  
 from PIL import Image
 from scipy.ndimage import label
@@ -35,59 +36,34 @@ vol_array_1 = scaler_1.scale_matrix_to_value()
 # Background removal
 segmenter_1 = Segmentation(volumetric_array=vol_array_1)
 bg_removed = segmenter_1.background_remover_volumetric(background_seed_point=[10,10,10], background_multiplier=3, background_number_of_iterations=10)
-# Apply Sobel filter
-filter_1 = Filters(sequence_directory=directory_path_1)
-sobel_filtered = filter_1.sobel_image_filter(img_arr=bg_removed)
-scaler_2 = Operations(volumetric_array_1=sobel_filtered)
-sobel_filtered = scaler_2.scale_matrix_to_value()
-# Apply thresholding
-segmenter_2 = Segmentation(volumetric_array=sobel_filtered)
-sobel_tresholded = segmenter_2.threshold_segmentation(lower_threshold=70)
-scaler_3 = Operations(volumetric_array_1=sobel_tresholded)
-sobel_tresholded = scaler_3.scale_matrix_to_value()
+# Normalize the pixel data to the range [0, 255]
+image = bg_removed
+image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+image = np.uint8(image)
+# Apply the Sobel filter
+sobelx = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
+sobely = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
+sobel_magnitude = np.sqrt(sobelx**2 + sobely**2)
+sobel_magnitude = np.uint8(np.absolute(sobel_magnitude))
+# Optional: Normalize the Sobel output
+sobel_magnitude = cv2.normalize(sobel_magnitude, None, 0, 255, cv2.NORM_MINMAX)
 
-# Active contours test to fit one image.
-image = img_as_float(sobel_tresholded[:, :, 80])
-# Apply Gaussian filter to smooth the image
-image_smooth = gaussian(image, sigma=2)
-# Center of the image
-# cy, cx = image.shape[0] // 2, image.shape[1] // 2  
-cy, cx = 65, 155
-# Radius of the initial circle
-r = 130
-s = np.linspace(0, 2*np.pi, 400)
-init = np.array([cy + r*np.sin(s), cx + r*np.cos(s)]).T
-# Run active contour model
-snake = active_contour(
-    image_smooth,
-    init,
-    alpha=0.0009,  # Snake length shape parameter
-    beta=0.5,  # Snake smoothness shape parameter
-    gamma=0.01,  # Time step
-    w_line=1,  # Attraction to edges
-    w_edge=1,  # Attraction to object boundaries
-)
 
 
 # Visualization
-fig, axs = plt.subplots(1, 4, figsize=(12, 6))
+fig, axs = plt.subplots(1, 3, figsize=(12, 6))
 axs[0].imshow(vol_array_1[:, :, 80], cmap='gray')
 axs[0].set_title('Original Image')
 axs[0].axis('off')
 
-axs[1].imshow(sobel_filtered[:, :, 80], cmap='gray')
-axs[1].set_title('Sobel')
+axs[1].imshow(bg_removed[:, :, 80], cmap='gray')
+axs[1].set_title('Image 1')
 axs[1].axis('off')
 
-axs[2].imshow(sobel_tresholded[:, :, 80], cmap='gray')
-axs[2].set_title('Sobel tresholded')
+axs[2].imshow(sobel_magnitude[:, :, 80], cmap='gray')
+axs[2].set_title('Image 2')
 axs[2].axis('off')
 
-axs[3].imshow(image, cmap='gray')
-axs[3].plot(init[:, 1], init[:, 0], '--r', lw=3, label="Initial Contour")
-axs[3].plot(snake[:, 1], snake[:, 0], '-b', lw=3, label="Final Contour")
-axs[3].set_title('Active Contour on MRI Slice')
-axs[3].axis('off')
 
 
 plt.show()
