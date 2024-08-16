@@ -166,7 +166,7 @@ class Segmentation:
         return largest_component_mask
 
     
-    def background_remover_volumetric(self, background_seed_point=[0,0,0], background_multiplier=5, background_number_of_iterations=100):
+    def background_remover_volumetric(self, background_seed_point=[0,0,0], background_multiplier=3, background_number_of_iterations=50):
         """
         Subtracts the background from the image array.
         Args:
