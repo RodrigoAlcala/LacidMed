@@ -10,11 +10,9 @@ from scipy.optimize import curve_fit
 
 from lacid_med.src.handler.loader import DicomLoaderMRI
 from lacid_med.src.processing.filters import Filters
-from lacid_med.src.visualization.plotter import DicomPlotter
 from lacid_med.src.visualization.histograms import HistogramGenerator
-from lacid_med.src.processing.fitting import Fitting
 from lacid_med.src.processing.operations import Operations
-from lacid_med.src.processing.segmentation import Segmentation
+
 
 # Definir la función de tres gaussianas
 def gaussian(x, amp, mu, sigma):
@@ -33,8 +31,7 @@ def main():
     org_vol = loader.volumetric_array
     print(org_vol.shape)
 
-    # Filtro N4
-    filter = Filters(sequence_directory=sequence_dir)
+    # Poner path de volumen previamente filtrado por N4. NO SE APLICA EL FILTRO EN ESTE SCRIPT 
     image = sitk.ReadImage("C:/codigos_volumetria/n4_corrected.nrrd")
     vol_filt = sitk.GetArrayFromImage(image)
     
@@ -42,16 +39,16 @@ def main():
     sitk.WriteImage(sitk.GetImageFromArray(vol_filt_stack),"C:/codigos_volumetria/no_norm_filt.nrrd")
 
     # Normalización
-    escalador_1 = Operations(volumetric_array_1=org_vol)   
+    #escalador_1 = Operations(volumetric_array_1=org_vol)   
     escalador_2 = Operations(volumetric_array_1=vol_filt_stack)
 
-    norm_vol_raw = escalador_1.scale_matrix_to_value(value=255)
-    norm_vol_filt = escalador_2.scale_matrix_to_value(value=255)
+    #norm_vol_raw = escalador_1.scale_matrix_to_value(value=255)
+    norm_vol_filt_stack = escalador_2.scale_matrix_to_value(value=255)
 
-    sitk.WriteImage(sitk.GetImageFromArray(vol_filt),"C:/codigos_volumetria/filtrada_norm.nrrd")
+    sitk.WriteImage(sitk.GetImageFromArray(norm_vol_filt_stack),"C:/codigos_volumetria/filtrada_norm.nrrd")
 
     # Histograma de la imagen normalizada filtrada
-    histogram3D = HistogramGenerator(array_3D=norm_vol_filt)
+    histogram3D = HistogramGenerator(array_3D=norm_vol_filt_stack)
     hist_filt, bins = histogram3D.create_mean_histogram_of_3d_array(offset=OFFSET, show=True, plot_title="Histogram of filtered image normalized", xlabel="Pixel value", ylabel="Frequency")
 
     # Ajuste del histograma con tres gaussianas
