@@ -250,6 +250,11 @@ def main():
     hist_2_global_normalized_no_gaussian = hist_2_global_normalized - hist_2_global_normalized_first_gaussian
     hist_3_global_normalized_no_gaussian = hist_3_global_normalized - hist_3_global_normalized_first_gaussian
     hist_4_global_normalized_no_gaussian = hist_4_global_normalized - hist_4_global_normalized_first_gaussian
+
+    hist_7_global_normalized_no_gaussian = hist_7_global_normalized - hist_7_global_normalized_first_gaussian
+    hist_8_global_normalized_no_gaussian = hist_8_global_normalized - hist_8_global_normalized_first_gaussian
+    hist_9_global_normalized_no_gaussian = hist_9_global_normalized - hist_9_global_normalized_first_gaussian
+    hist_10_global_normalized_no_gaussian = hist_10_global_normalized - hist_10_global_normalized_first_gaussian
     
 
     gradient_hist_1_normalized = (gradient_hist_1 - np.min(gradient_hist_1)) / (np.max(gradient_hist_1) - np.min(gradient_hist_1))
@@ -358,7 +363,19 @@ def main():
     print("volume_3 is: ", volume_3)  
     print("volume_4 is: ", volume_4)
 
+    full_volume_1 = np.sum(hist_7)
+    full_volume_2 = np.sum(hist_8)
+    full_volume_3 = np.sum(hist_9)
+    full_volume_4 = np.sum(hist_10)
+    print("Full volume_1 is: ", full_volume_1)
+    print("Full volume_2 is: ", full_volume_2)
+    print("Full volume_3 is: ", full_volume_3)
+    print("Full volume_4 is: ", full_volume_4)
 
+    print("Full volume 1 without gaussian: ", np.sum(hist_7_global_normalized_no_gaussian))
+    print("Full volume 2 without gaussian: ", np.sum(hist_8_global_normalized_no_gaussian))
+    print("Full volume 3 without gaussian: ", np.sum(hist_9_global_normalized_no_gaussian))
+    print("Full volume 4 without gaussian: ", np.sum(hist_10_global_normalized_no_gaussian))
     
 
 if __name__ == "__main__":
