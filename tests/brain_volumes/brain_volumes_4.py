@@ -75,10 +75,10 @@ def main():
     image_4 = ants.image_read(moving_path_4)
     image_5 = ants.image_read(moving_path_5)
     
-    registration(fixed_path_1, moving_path_2, 'C:/Users/santi/Desktop/Volumetria/Marquez_Gisela/22-TFE/nii/registered')
-    registration(fixed_path_1, moving_path_3, 'C:/Users/santi/Desktop/Volumetria/Marquez_Gisela/21-TFE/nii/registered')
-    registration(fixed_path_1, moving_path_4, 'C:/Users/santi/Desktop/Volumetria/Marquez_Gisela/20-TFE/nii/registered')
-    registration(fixed_path_1, moving_path_5, 'C:/Users/santi/Desktop/Volumetria/Marquez_Gisela/19-CUBE/nii/registered')
+    # registration(fixed_path_1, moving_path_2, 'C:/Users/santi/Desktop/Volumetria/Marquez_Gisela/22-TFE/nii/registered')
+    # registration(fixed_path_1, moving_path_3, 'C:/Users/santi/Desktop/Volumetria/Marquez_Gisela/21-TFE/nii/registered')
+    # registration(fixed_path_1, moving_path_4, 'C:/Users/santi/Desktop/Volumetria/Marquez_Gisela/20-TFE/nii/registered')
+    # registration(fixed_path_1, moving_path_5, 'C:/Users/santi/Desktop/Volumetria/Marquez_Gisela/19-CUBE/nii/registered')
 
 
     # load registered images. 
@@ -185,11 +185,12 @@ def main():
     hist_3_global_normalized = hist_3 / global_max
     hist_4_global_normalized = hist_4 / global_max
     hist_5_global_normalized = hist_5 / global_max
-    
+
 
     # Define the window size (number of points to average over)
     window_size = 5
     window = np.ones(window_size) / window_size
+
     # Apply the moving average
     hist_1_global_normalized_smoothed = np.convolve(hist_1_global_normalized, window, mode='same')
     hist_2_global_normalized_smoothed = np.convolve(hist_2_global_normalized, window, mode='same')
@@ -197,13 +198,11 @@ def main():
     hist_4_global_normalized_smoothed = np.convolve(hist_4_global_normalized, window, mode='same')
     hist_5_global_normalized_smoothed = np.convolve(hist_5_global_normalized, window, mode='same')
 
-
     hist_1_global_normalized_smoothed_peaks, _ = find_peaks(hist_1_global_normalized_smoothed)
     hist_2_global_normalized_smoothed_peaks, _ = find_peaks(hist_2_global_normalized_smoothed)
     hist_3_global_normalized_smoothed_peaks, _ = find_peaks(hist_3_global_normalized_smoothed)
     hist_4_global_normalized_smoothed_peaks, _ = find_peaks(hist_4_global_normalized_smoothed)
     hist_5_global_normalized_smoothed_peaks, _ = find_peaks(hist_5_global_normalized_smoothed)
-
 
     hist_1_global_normalized_first_gaussian = np.zeros_like(hist_1_global_normalized)
     hist_1_global_normalized_first_gaussian[0:hist_1_global_normalized_smoothed_peaks[0]] = hist_1_global_normalized[0:hist_1_global_normalized_smoothed_peaks[0]] 
@@ -236,6 +235,68 @@ def main():
     hist_3_global_normalized_no_gaussian = hist_3_global_normalized - hist_3_global_normalized_first_gaussian
     hist_4_global_normalized_no_gaussian = hist_4_global_normalized - hist_4_global_normalized_first_gaussian
     hist_5_global_normalized_no_gaussian = hist_5_global_normalized - hist_5_global_normalized_first_gaussian
+
+    global_max_no_scaling = np.max([max(hist_7), max(hist_8), max(hist_9), max(hist_10), max(hist_11)])
+    hist_7_global_normalized = hist_7 / global_max_no_scaling
+    hist_8_global_normalized = hist_8 / global_max_no_scaling
+    hist_9_global_normalized = hist_9 / global_max_no_scaling
+    hist_10_global_normalized = hist_10 / global_max_no_scaling
+    hist_11_global_normalized = hist_11 / global_max_no_scaling
+
+    # Define the window size (number of points to average over)
+    window_size_no_scaling = 100
+    window_no_scaling = np.ones(window_size_no_scaling) / window_size_no_scaling
+
+    # Apply the moving average
+    hist_7_global_normalized_smoothed = np.convolve(hist_7_global_normalized, window_no_scaling, mode='same')
+    hist_8_global_normalized_smoothed = np.convolve(hist_8_global_normalized, window_no_scaling, mode='same')
+    hist_9_global_normalized_smoothed = np.convolve(hist_9_global_normalized, window_no_scaling, mode='same')
+    hist_10_global_normalized_smoothed = np.convolve(hist_10_global_normalized, window_no_scaling, mode='same')
+    hist_11_global_normalized_smoothed = np.convolve(hist_11_global_normalized, window_no_scaling, mode='same')
+    
+    hist_7_global_normalized_smoothed_peaks, _ = find_peaks(hist_7_global_normalized_smoothed)
+    hist_8_global_normalized_smoothed_peaks, _ = find_peaks(hist_8_global_normalized_smoothed)
+    hist_9_global_normalized_smoothed_peaks, _ = find_peaks(hist_9_global_normalized_smoothed)
+    hist_10_global_normalized_smoothed_peaks, _ = find_peaks(hist_10_global_normalized_smoothed)
+    hist_11_global_normalized_smoothed_peaks, _ = find_peaks(hist_11_global_normalized_smoothed)
+
+    hist_7_global_normalized_first_gaussian = np.zeros_like(hist_7_global_normalized) 
+    hist_7_global_normalized_first_gaussian[0:hist_7_global_normalized_smoothed_peaks[0]] = hist_7_global_normalized[0:hist_7_global_normalized_smoothed_peaks[0]]
+    hist_7_reversed_first_gaussian = np.flip(hist_7_global_normalized[0:hist_7_global_normalized_smoothed_peaks[0]])
+    hist_7_global_normalized_first_gaussian[hist_7_global_normalized_smoothed_peaks[0]:hist_7_global_normalized_smoothed_peaks[0] * 2] = hist_7_reversed_first_gaussian
+
+    hist_8_global_normalized_first_gaussian = np.zeros_like(hist_8_global_normalized) 
+    hist_8_global_normalized_first_gaussian[0:hist_8_global_normalized_smoothed_peaks[0]] = hist_8_global_normalized[0:hist_8_global_normalized_smoothed_peaks[0]]
+    hist_8_reversed_first_gaussian = np.flip(hist_8_global_normalized[0:hist_8_global_normalized_smoothed_peaks[0]])
+    hist_8_global_normalized_first_gaussian[hist_8_global_normalized_smoothed_peaks[0]:hist_8_global_normalized_smoothed_peaks[0] * 2] = hist_8_reversed_first_gaussian
+
+    hist_9_global_normalized_first_gaussian = np.zeros_like(hist_9_global_normalized)
+    hist_9_global_normalized_first_gaussian[0:hist_9_global_normalized_smoothed_peaks[0]] = hist_9_global_normalized[0:hist_9_global_normalized_smoothed_peaks[0]]
+    hist_9_reversed_first_gaussian = np.flip(hist_9_global_normalized[0:hist_9_global_normalized_smoothed_peaks[0]])
+    hist_9_global_normalized_first_gaussian[hist_9_global_normalized_smoothed_peaks[0]:hist_9_global_normalized_smoothed_peaks[0] * 2] = hist_9_reversed_first_gaussian
+
+    hist_10_global_normalized_first_gaussian = np.zeros_like(hist_10_global_normalized)
+    hist_10_global_normalized_first_gaussian[0:hist_10_global_normalized_smoothed_peaks[0]] = hist_10_global_normalized[0:hist_10_global_normalized_smoothed_peaks[0]]
+    hist_10_reversed_first_gaussian = np.flip(hist_10_global_normalized[0:hist_10_global_normalized_smoothed_peaks[0]])
+    hist_10_global_normalized_first_gaussian[hist_10_global_normalized_smoothed_peaks[0]:hist_10_global_normalized_smoothed_peaks[0] * 2] = hist_10_reversed_first_gaussian
+
+    hist_11_global_normalized_first_gaussian = np.zeros_like(hist_11_global_normalized)
+    hist_11_global_normalized_first_gaussian[0:hist_11_global_normalized_smoothed_peaks[0]] = hist_11_global_normalized[0:hist_11_global_normalized_smoothed_peaks[0]]
+    hist_11_reversed_first_gaussian = np.flip(hist_11_global_normalized[0:hist_11_global_normalized_smoothed_peaks[0]])
+    hist_11_global_normalized_first_gaussian[hist_11_global_normalized_smoothed_peaks[0]:hist_11_global_normalized_smoothed_peaks[0] * 2] = hist_11_reversed_first_gaussian
+
+
+    hist_1_global_normalized_no_gaussian = hist_1_global_normalized - hist_1_global_normalized_first_gaussian
+    hist_2_global_normalized_no_gaussian = hist_2_global_normalized - hist_2_global_normalized_first_gaussian
+    hist_3_global_normalized_no_gaussian = hist_3_global_normalized - hist_3_global_normalized_first_gaussian
+    hist_4_global_normalized_no_gaussian = hist_4_global_normalized - hist_4_global_normalized_first_gaussian
+    hist_5_global_normalized_no_gaussian = hist_5_global_normalized - hist_5_global_normalized_first_gaussian
+    
+    hist_7_global_normalized_no_gaussian = hist_7_global_normalized - hist_7_global_normalized_first_gaussian
+    hist_8_global_normalized_no_gaussian = hist_8_global_normalized - hist_8_global_normalized_first_gaussian
+    hist_9_global_normalized_no_gaussian = hist_9_global_normalized - hist_9_global_normalized_first_gaussian
+    hist_10_global_normalized_no_gaussian = hist_10_global_normalized - hist_10_global_normalized_first_gaussian
+    hist_11_global_normalized_no_gaussian = hist_11_global_normalized - hist_11_global_normalized_first_gaussian
 
 
     gradient_hist_1_normalized = (gradient_hist_1 - np.min(gradient_hist_1)) / (np.max(gradient_hist_1) - np.min(gradient_hist_1))
@@ -321,13 +382,30 @@ def main():
     volume_4 = np.sum(hist_4_global_normalized_no_gaussian)
     volume_5 = np.sum(hist_5_global_normalized_no_gaussian)
     
-    
     print("volume_1 is: ", volume_1)
     print("volume_2 is: ", volume_2)
     print("volume_3 is: ", volume_3)  
     print("volume_4 is: ", volume_4)
     print("volume_5 is: ", volume_5)
-    
+
+    full_volume_1 = np.sum(hist_7)
+    full_volume_2 = np.sum(hist_8)
+    full_volume_3 = np.sum(hist_9)
+    full_volume_4 = np.sum(hist_10)
+    full_volume_5 = np.sum(hist_11)
+
+    print("Full volume_1 is: ", full_volume_1)
+    print("Full volume_2 is: ", full_volume_2)
+    print("Full volume_3 is: ", full_volume_3)
+    print("Full volume_4 is: ", full_volume_4)
+    print("Full volume_5 is: ", full_volume_5)
+
+    print("Full volume 1 without gaussian: ", np.sum(hist_7_global_normalized_no_gaussian))
+    print("Full volume 2 without gaussian: ", np.sum(hist_8_global_normalized_no_gaussian))
+    print("Full volume 3 without gaussian: ", np.sum(hist_9_global_normalized_no_gaussian))
+    print("Full volume 4 without gaussian: ", np.sum(hist_10_global_normalized_no_gaussian))
+    print("Full volume 5 without gaussian: ", np.sum(hist_11_global_normalized_no_gaussian))
+
 
 
 if __name__ == "__main__":
