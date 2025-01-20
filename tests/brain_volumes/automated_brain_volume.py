@@ -58,15 +58,6 @@ def brains(input_directory):
         raise ValueError("Invalid directory path")
     
     
-    
-
-
-
-
-
-
-
-
 def main(): 
     print("running")
 

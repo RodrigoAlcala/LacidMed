@@ -49,7 +49,7 @@ sobel_tresholded = scaler_3.scale_matrix_to_value()
 
 # Active contours test to fit one image.
 volume_contour = []
-# cy, cx = image.shape[0] // 2, image.shape[1] // 2  
+#cy, cx = image.shape[0] // 2, image.shape[1] // 2  
 cy, cx = 80, 140
 r = 130
 s = np.linspace(0, 2*np.pi, 400)
@@ -59,7 +59,13 @@ for i in range(120, vol_array_1.shape[2]):
     image_smooth = gaussian(image, sigma=2)
     snake = active_contour(image_smooth, init, alpha=0.1, beta=0.1, gamma=0.01, w_line=1,w_edge=1)
     volume_contour.append([snake[:, 1], snake[:, 0]])
-# volume_contour=np.dstack(volume_contour)
+
+#print(volume_contour.shape)
+
+writer = MultipleFileWriter(loader_1.sorted_files)
+writer.write(volume_contour,'C:/codigos_tesis/countour_dicom')
+
+volume_contour=np.dstack(volume_contour)
 sitk.WriteImage(sitk.GetImageFromArray(volume_contour), "C:/codigos_tesis/active_countour.nrrd")
 
 # Visualization

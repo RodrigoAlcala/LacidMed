@@ -12,8 +12,6 @@ from skimage.filters import gaussian
 from skimage.segmentation import active_contour
 from skimage.draw import circle_perimeter
 
-
-
 # lacid_med directory append.
 import sys
 sys.path.append("C:/Users/santi/Desktop/Fuesmen/code/LacidMed")
@@ -144,7 +142,6 @@ axs[1, 2].plot(init[:, 1], init[:, 0], '--r', lw=3, label="Initial Contour")
 axs[1, 2].plot(snake[:, 1], snake[:, 0], '-b', lw=3, label="Final Contour")
 axs[1, 2].set_title('Active Contour on MRI Slice')
 axs[1, 2].axis('off')
-
 
 plt.show()
 

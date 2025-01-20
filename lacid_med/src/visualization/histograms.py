@@ -133,7 +133,7 @@ class HistogramGenerator:
             return None, None
 
         arr_max = int(np.max(self.array_3D))
-        hist, bins = np.histogram(self.array_3D.flatten(), bins=arr_max, density=False)
+        hist, bins = np.histogram(self.array_3D.flatten(), bins=arr_max, density=False) #flaten trnasforma matriz en arrray
         hist_mean = hist / self.array_3D.shape[2]
 
         if offset < len(bins):
